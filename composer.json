@@ -20,15 +20,22 @@
     },
     "autoload": {
         "psr-4": {
-            "SilverStripeModule\\Skeleton\\": "src/",
-            "SilverStripeModule\\Skeleton\\Tests\\": "tests/php/"
+            "SilverstripeSearch\\": "src/",
+            "SilverstripeSearch\\Tests\\": "tests/php/"
         }
     },
     "extra": {
         "expose": [
-            "client/dist"
+            "client/base/dist"
         ]
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "config": {
+        "allow-plugins": {
+            "composer/installers": true,
+            "phpstan/extension-installer": true,
+            "silverstripe/vendor-plugin": true
+        }
+    }
 }

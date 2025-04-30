@@ -17,8 +17,12 @@
   },
   "dependencies": {
     "core-js": "^3.26.0",
-    "react": "^18.2.0"
+    "piral-cli": "^1.8.5",
+    "piral-cli-esbuild": "^1.2.2"
   },
+  "workspaces": [
+    "client/*"
+  ],
   "devDependencies": {
     "@babel/runtime": "^7.20.0",
     "@silverstripe/eslint-config": "^1.0.0",

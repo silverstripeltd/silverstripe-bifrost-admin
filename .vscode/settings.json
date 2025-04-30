@@ -17,5 +17,6 @@
     "debug.javascript.defaultRuntimeExecutable": {
         "pwa-node": "/Users/bernie/.local/share/mise/shims/node"
     },
-    "python.defaultInterpreterPath": "/Users/bernie/.local/share/mise/installs/python/3.11.9/bin/python"
+    "python.defaultInterpreterPath": "/Users/bernie/.local/share/mise/installs/python/3.11.9/bin/python",
+    "phpcs.enable": false
 }
