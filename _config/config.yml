@@ -1,1 +1,12 @@
-# see https://docs.silverstripe.org/en/developer_guides/configuration/configuration/
+SilverstripeSearch\Admin\SilvestripeSearchAdmin:
+    pilets:
+        - name: 'synonyms'
+          version: 1
+          link: 'silverstripe/silverstripe-bifrost-admin:client/synonyms/dist/index.js'
+          requireRef: System.import
+          spec: v3
+        - name: 'landing'
+          version: 1
+          link: 'silverstripe/silverstripe-bifrost-admin:client/landing/dist/index.js'
+          requireRef: System.import
+          spec: v3

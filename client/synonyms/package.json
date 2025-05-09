@@ -1,0 +1,41 @@
+{
+  "name": "synonyms",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "pilet"
+  ],
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "formik": "^2.4.6",
+    "piral-cli": "^1.8.5",
+    "piral-cli-esbuild": "^1",
+    "react": "18.3.1",
+    "react-modal": "^3.16.3",
+    "react-router": "5.3.4",
+    "react-router-dom": "5.3.4",
+    "silverstripe-search-admin": "../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz",
+    "tslib": "2.8.1",
+    "typescript": "latest"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "importmap": {
+    "inherit": [
+      "silverstripe-search-admin"
+    ],
+    "imports": {}
+  },
+  "scripts": {
+    "start": "pilet debug",
+    "build": "pilet build --fresh",
+    "watch": "pilet debug",
+    "upgrade": "pilet upgrade",
+    "postinstall": "pilet declaration"
+  },
+  "source": "src/index.tsx"
+}

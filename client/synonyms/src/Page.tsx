@@ -1,0 +1,77 @@
+import * as React from "react";
+import { LocationType, MatchType } from ".";
+import { useEffect } from "react";
+import { useState } from "react";
+import { SynonymRule, CMSApi } from "./api";
+import { AddForm } from "./AddForm";
+import { EditForm } from "./EditForm";
+
+interface PageProps {
+    api: CMSApi;
+    match: MatchType;
+    location: LocationType;
+}
+
+export default ({ api, match }: PageProps) => {
+    const [synonymRules, setSynonymRules] = useState([]);
+    const engine = match.params.engineName;
+    const refresh = () => {
+        api.getSynonyms(engine).then((resp: Array<SynonymRule>) => {
+            setSynonymRules(resp);
+        });
+    };
+
+    useEffect(() => {
+        refresh();
+    }, []);
+
+    const addRule = api.addSynonymRule.bind(null, engine);
+
+    const removeRule = (id: string) => {
+        api.deleteSynonymRule(engine, id).then(() => {
+            refresh();
+        });
+    };
+
+    const updateRule = (rule: SynonymRule): Promise<SynonymRule> => {
+        return api.updateSynonymRule(engine, rule).then((rule) => {
+            refresh();
+            return rule;
+        });
+    };
+
+    function renderRules(rules: Array<SynonymRule>) {
+        return rules.map((rule) => {
+            const root = rule.root.length ? (<><strong>root</strong>: {rule.root.join(', ')}</>) : null;
+            return (
+            <li key={rule.id} data-rule-id={rule.id} className="list-group-item">
+                <strong>type</strong>: {rule.type} {root} <strong>synonyms</strong>: {rule.synonyms.join(",")}
+                <EditForm
+                    update={updateRule}
+                    onClose={refresh}
+                    initialValues={{
+                        id: rule.id,
+                        synonyms: rule.synonyms.join("\n"),
+                        root: rule.root.join("\n"),
+                        type: rule.type,
+                    }}
+                />
+                <button className="btn btn-outline-danger" onClick={() => removeRule(rule.id)}>delete</button>
+            </li>
+        )});
+    }
+
+    return (
+        <>
+            <h1>Synonym management</h1>
+            <p>Here you can manage the synonyms for your engine</p>
+            <AddForm
+                add={addRule}
+                onClose={refresh}
+            />
+
+            <h2>Synonyms:</h2>
+            <ul className="list-group">{renderRules(synonymRules)}</ul>
+        </>
+    );
+};

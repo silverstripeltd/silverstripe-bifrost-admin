@@ -6,11 +6,13 @@
     "piral"
   ],
   "dependencies": {
+    "formik": "^2.4.6",
     "piral": "1.8.5",
     "piral-base": "1.8.5",
     "piral-core": "1.8.5",
     "react": "18",
     "react-dom": "^18",
+    "react-modal": "^3.16.3",
     "react-router": "^5",
     "react-router-dom": "^5",
     "tslib": "^2.8.1"
@@ -19,11 +21,15 @@
   "scripts": {
     "start": "piral debug",
     "build": "piral build --public-url 'admin/silverstripesearch/'",
+    "watch": "piral build --watch  --no-minify --public-url 'admin/silverstripesearch/'",
     "postinstall": "piral declaration"
   },
   "types": "dist/index.d.ts",
   "importmap": {
-    "imports": {},
+    "imports": {
+      "react-modal": "react-modal",
+      "formik": "formik"
+    },
     "inherit": [
       "piral-base",
       "piral-core",
@@ -34,6 +40,7 @@
     "@types/node": "latest",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react-modal": "^3",
     "@types/react-router": "^5",
     "@types/react-router-dom": "^5",
     "piral-cli": "1.8.5",

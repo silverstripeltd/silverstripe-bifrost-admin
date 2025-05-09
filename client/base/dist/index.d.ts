@@ -1,4 +1,3 @@
-import * as React from 'react';
 import * as ReactRouter from 'react-router';
 
 /**
@@ -44,7 +43,7 @@ export interface EventEmitter {
 /**
  * Custom Pilet API parts defined outside of piral-core.
  */
-export interface PiletCustomApi extends PiletLocaleApi, PiletDashboardApi, PiletMenuApi, PiletNotificationsApi, PiletModalsApi, PiletFeedsApi {}
+export interface PiletCustomApi extends PiletCMSApi, PiletLocaleApi, PiletDashboardApi, PiletMenuApi, PiletNotificationsApi, PiletModalsApi, PiletFeedsApi {}
 
 /**
  * Defines the Pilet API from piral-core.
@@ -99,7 +98,7 @@ export interface PiletCoreApi {
    * @param props The extension's rendering props.
    * @return The created React element.
    */
-  Extension<TName>(props: ExtensionSlotProps<TName>): React.ReactElement | null;
+  Extension<TName>(props: ExtensionSlotProps<TName>): ReactElement | null;
   /**
    * Renders an extension in a plain DOM component.
    * @param element The DOM element or shadow root as a container for rendering the extension.
@@ -172,6 +171,10 @@ export interface PiralEventMap extends PiralCustomEventMap {
   "unhandled-error": PiralUnhandledErrorEvent;
   "loading-pilets": PiralLoadingPiletsEvent;
   "loaded-pilets": PiralLoadedPiletsEvent;
+}
+
+export interface PiletCMSApi {
+  getEngines(): Promise<Array<String>>;
 }
 
 export interface PiletLocaleApi {
@@ -265,7 +268,7 @@ export interface PiletNotificationsApi {
    * @param options The options to consider for showing the notification.
    * @returns A callback to trigger closing the notification.
    */
-  showNotification(content: string | React.ReactElement<any, any> | AnyComponent<NotificationComponentProps>, options?: NotificationOptions): Disposable;
+  showNotification(content: string | ReactElement<any, any> | AnyComponent<NotificationComponentProps>, options?: NotificationOptions): Disposable;
 }
 
 export interface PiletModalsApi {
@@ -321,7 +324,7 @@ export type DataStoreOptions = DataStoreTarget | CustomDataStoreOptions;
 /**
  * Possible shapes for a component.
  */
-export type AnyComponent<T> = React.ComponentType<T> | FirstParametersOf<ComponentConverters<T>>;
+export type AnyComponent<T> = ComponentType<T> | FirstParametersOf<ComponentConverters<T>>;
 
 /**
  * The props used by a page component.
@@ -336,7 +339,7 @@ export interface PageComponentProps<T extends {
   /**
    * The children of the page.
    */
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 /**
@@ -360,13 +363,6 @@ export interface RegistrationDisposer {
 export type AnyExtensionComponent<TName> = TName extends keyof PiralExtensionSlotMap ? AnyComponent<ExtensionComponentProps<TName>> : TName extends string ? AnyComponent<ExtensionComponentProps<any>> : AnyComponent<ExtensionComponentProps<TName>>;
 
 /**
- * Make all properties in T optional
- */
-export type Partial<T> = {
-  [P in keyof T]?: T[P];
-};
-
-/**
  * Gives the extension params shape for the given extension slot name.
  */
 export type ExtensionParams<TName> = TName extends keyof PiralExtensionSlotMap ? PiralExtensionSlotMap[TName] : TName extends string ? any : TName;
@@ -376,23 +372,7 @@ export type ExtensionParams<TName> = TName extends keyof PiralExtensionSlotMap ?
  */
 export type ExtensionSlotProps<TName = string> = BaseExtensionSlotProps<TName extends string ? TName : string, ExtensionParams<TName>>;
 
-/**
- * Any HTML element. Some elements directly implement this interface, while others implement it via an interface that inherits it.
- * 
- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/HTMLElement)
- */
-export const HTMLElement: {
-  prototype: HTMLElement;
-  new (): HTMLElement;
-};
-
-/**
- * [MDN Reference](https://developer.mozilla.org/docs/Web/API/ShadowRoot)
- */
-export const ShadowRoot: {
-  prototype: ShadowRoot;
-  new (): ShadowRoot;
-};
+export interface ReactElement {}
 
 /**
  * Can be implemented by functions to be used for disposal purposes.
@@ -403,13 +383,6 @@ export interface Disposable {
    */
   (): void;
 }
-
-/**
- * Construct a type with a set of properties K of type T
- */
-export type Record<K extends keyof any, T> = {
-  [P in K]: T;
-};
 
 /**
  * Custom events defined outside of piral-core.
@@ -500,8 +473,6 @@ export interface PiralLoadedPiletsEvent {
   error?: Error;
 }
 
-export const Array: ArrayConstructor;
-
 export type AnyLocalizationMessages = LocalizationMessages | NestedLocalizationMessages;
 
 export interface LocalizationMessages {
@@ -562,7 +533,7 @@ export type FeedConnector<TData, TReducers = {}> = GetActions<TReducers> & {
    * Connector function for wrapping a component.
    * @param component The component to connect by providing a data prop.
    */
-  <TProps>(component: React.ComponentType<TProps & FeedConnectorProps<TData>>): React.FC<TProps>;
+  <TProps>(component: ComponentType<TProps & FeedConnectorProps<TData>>): FC<TProps>;
   /**
    * Invalidates the underlying feed connector.
    * Forces a reload on next use.
@@ -622,6 +593,18 @@ export interface CustomDataStoreOptions {
   expires?: "never" | Date | number;
 }
 
+/**
+ * Represents any user-defined component, either as a function or a class.
+ * 
+ * Similar to {@link JSXElementConstructor}, but with extra properties like
+ * {@link FunctionComponent.defaultPropsdefaultProps } and
+ * {@link ComponentClass.contextTypescontextTypes}.
+ * @template P The props the component accepts.
+ * @see {@link ComponentClass }
+ * @see {@link FunctionComponent }
+ */
+export type ComponentType<P = {}> = ComponentClass<P> | FunctionComponent<P>;
+
 export type FirstParametersOf<T> = {
   [K in keyof T]: T[K] extends (arg: any) => any ? FirstParameter<T[K]> : never;
 }[keyof T];
@@ -645,6 +628,32 @@ export interface RouteBaseProps<UrlParams extends {
 } = {}, UrlState = any> extends ReactRouter.RouteComponentProps<UrlParams, {}, UrlState>, BaseComponentProps {}
 
 /**
+ * Represents all of the things React can render.
+ * 
+ * Where {@link ReactElement} only represents JSX, `ReactNode` represents everything that can be rendered.
+ * @see {@link https://react-typescript-cheatsheet.netlify.app/docs/react-types/reactnode/ React TypeScript Cheatsheet}
+ * @example
+ * ```tsx
+ * // Typing children
+ * type Props = { children: ReactNode }
+ * 
+ * const Component = ({ children }: Props) => <div>{children}</div>
+ * 
+ * <Component>hello</Component>
+ * ```
+ * @example
+ * ```tsx
+ * // Typing a custom element
+ * type Props = { customElement: ReactNode }
+ * 
+ * const Component = ({ customElement }: Props) => <div>{customElement}</div>
+ * 
+ * <Component customElement={<div>hello</div>} />
+ * ```
+ */
+export type ReactNode = ReactElement | string | number | Iterable<ReactNode> | ReactPortal | boolean | null | undefined | DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_REACT_NODES[keyof DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_REACT_NODES];
+
+/**
  * Custom meta data to include for pages.
  */
 export interface PiralCustomPageMeta {}
@@ -660,7 +669,7 @@ export interface ExtensionComponentProps<T> extends BaseComponentProps {
   /**
    * The optional children to receive, if any.
    */
-  children?: React.ReactNode;
+  children?: ReactNode;
 }
 
 /**
@@ -675,12 +684,12 @@ export interface BaseExtensionSlotProps<TName, TParams> {
   /**
    * The children to transport, if any.
    */
-  children?: React.ReactNode;
+  children?: ReactNode;
   /**
    * Defines what should be rendered when no components are available
    * for the specified extension.
    */
-  empty?(props: TParams): React.ReactNode;
+  empty?(props: TParams): ReactNode;
   /**
    * Determines if the `render` function should be called in case no
    * components are available for the specified extension.
@@ -703,7 +712,7 @@ export interface BaseExtensionSlotProps<TName, TParams> {
    * @param nodes The rendered extension nodes.
    * @returns The rendered nodes, i.e., an ReactElement.
    */
-  render?(nodes: Array<React.ReactNode>): React.ReactElement<any, any> | null;
+  render?(nodes: Array<ReactNode>): ReactElement<any, any> | null;
   /**
    * The custom parameters for the given extension.
    */
@@ -724,8 +733,6 @@ export interface PiralSelectLanguageEvent {
    */
   currentLanguage: string;
 }
-
-export const Error: ErrorConstructor;
 
 /**
  * The options for loading pilets.
@@ -776,45 +783,6 @@ export interface LoadPiletsOptions {
  * An evaluated pilet, i.e., a full pilet: functionality and metadata.
  */
 export type Pilet = SinglePilet | MultiPilet;
-
-export interface ArrayConstructor {
-  new (arrayLength?: number): Array<any>;
-  (arrayLength?: number): Array<any>;
-  <T>(arrayLength: number): Array<T>;
-  <T>(...items: Array<T>): Array<T>;
-  isArray(arg: any): arg is Array<any>;
-  readonly prototype: Array<any>;
-  /**
-   * Creates an array from an array-like object.
-   * @param arrayLike An array-like object to convert to an array.
-   */
-  from<T>(arrayLike: ArrayLike<T>): Array<T>;
-  /**
-   * Creates an array from an iterable object.
-   * @param arrayLike An array-like object to convert to an array.
-   * @param mapfn A mapping function to call on every element of the array.
-   * @param thisArg Value of 'this' used to invoke the mapfn.
-   */
-  from<T, U>(arrayLike: ArrayLike<T>, mapfn: (v: T, k: number) => U, thisArg?: any): Array<U>;
-  /**
-   * Returns a new array from a set of elements.
-   * @param items A set of elements to include in the new array object.
-   */
-  of<T>(...items: Array<T>): Array<T>;
-  /**
-   * Creates an array from an iterable object.
-   * @param iterable An iterable object to convert to an array.
-   */
-  from<T>(iterable: Iterable<T> | ArrayLike<T>): Array<T>;
-  /**
-   * Creates an array from an iterable object.
-   * @param iterable An iterable object to convert to an array.
-   * @param mapfn A mapping function to call on every element of the array.
-   * @param thisArg Value of 'this' used to invoke the mapfn.
-   */
-  from<T, U>(iterable: Iterable<T> | ArrayLike<T>, mapfn: (v: T, k: number) => U, thisArg?: any): Array<U>;
-  readonly [Symbol.species]: ArrayConstructor;
-}
 
 export interface NestedLocalizationMessages {
   [lang: string]: NestedTranslations;
@@ -908,8 +876,6 @@ export interface BareModalComponentProps<TOpts> {
   options?: TOpts;
 }
 
-export const Promise: PromiseConstructor;
-
 export type GetActions<TReducers> = {
   [P in keyof TReducers]: (...args: RemainingArgs<TReducers[P]>) => void;
 };
@@ -921,6 +887,32 @@ export interface FeedConnectorProps<TData> {
   data: TData;
 }
 
+/**
+ * Represents the type of a function component. Can optionally
+ * receive a type argument that represents the props the component
+ * receives.
+ * @template P The props the component accepts.
+ * @see {@link https://react-typescript-cheatsheet.netlify.app/docs/basic/getting-started/function_components React TypeScript Cheatsheet}
+ * @alias for {@link FunctionComponent }
+ * @example
+ * ```tsx
+ * // With props:
+ * type Props = { name: string }
+ * 
+ * const MyComponent: FC<Props> = (props) => {
+ *  return <div>{props.name}</div>
+ * }
+ * ```
+ * @example
+ * ```tsx
+ * // Without props:
+ * const MyComponentWithoutProps: FC = () => {
+ *   return <div>MyComponentWithoutProps</div>
+ * }
+ * ```
+ */
+export type FC<P = {}> = FunctionComponent<P>;
+
 export interface FeedSubscriber<TItem> {
   (callback: (value: TItem) => void): Disposable;
 }
@@ -929,10 +921,9 @@ export interface FeedReducer<TData, TAction> {
   (data: TData, item: TAction): Promise<TData> | TData;
 }
 
-/**
- * Enables basic storage and retrieval of dates and times.
- */
-export const Date: DateConstructor;
+export interface ComponentClass {}
+
+export interface FunctionComponent {}
 
 export type FirstParameter<T extends (arg: any) => any> = T extends (arg: infer P) => any ? P : never;
 
@@ -983,6 +974,10 @@ export interface ForeignComponent<TProps> {
   unmount?(element: HTMLElement, locals: Record<string, any>): void;
 }
 
+export interface ReactPortal {}
+
+export interface DO_NOT_USE_OR_YOU_WILL_BE_FIRED_EXPERIMENTAL_REACT_NODES {}
+
 /**
  * Custom extension slots outside of piral-core.
  */
@@ -1004,22 +999,6 @@ export interface ExtensionRegistration extends BaseRegistration {
    * The default params (i.e., meta) of the extension.
    */
   defaults: any;
-}
-
-export interface ErrorConstructor {
-  new (message?: string): Error;
-  (message?: string): Error;
-  readonly prototype: Error;
-  /**
-   * Create .stack property on a target object
-   */
-  captureStackTrace(targetObject: object, constructorOpt?: Function): void;
-  /**
-   * Optional override for formatting stack traces
-   * @see https://v8.dev/docs/stack-trace-api#customizing-stack-traces
-   */
-  prepareStackTrace?: ((err: Error, stackTraces: Array<NodeJS_CallSite>) => any) | undefined;
-  stackTraceLimit: number;
 }
 
 /**
@@ -1117,17 +1096,6 @@ export type SinglePilet = SinglePiletApp & PiletMetadata;
  */
 export type MultiPilet = MultiPiletApp & PiletMetadata;
 
-export const Symbol: SymbolConstructor;
-
-export interface ArrayLike<T> {
-  readonly length: number;
-  [n: number]: T;
-}
-
-export interface Iterable<T, TReturn = any, TNext = any> {
-  [Symbol.iterator](): Iterator<T, TReturn, TNext>;
-}
-
 export interface NestedTranslations {
   [tag: string]: string | NestedTranslations;
 }
@@ -1180,138 +1148,7 @@ export interface PiralNotificationTypes extends PiralCustomNotificationTypes {
 
 export interface PiralCustomModalsMap {}
 
-export interface PromiseConstructor {
-  /**
-   * Creates a Promise that is resolved with an array of results when all of the provided Promises
-   * resolve, or rejected when any Promise is rejected.
-   * @param values An iterable of Promises.
-   * @returns A new Promise.
-   */
-  all<T>(values: Iterable<T | PromiseLike<T>>): Promise<Array<Awaited<T>>>;
-  /**
-   * Creates a Promise that is resolved or rejected when any of the provided Promises are resolved
-   * or rejected.
-   * @param values An iterable of Promises.
-   * @returns A new Promise.
-   */
-  race<T>(values: Iterable<T | PromiseLike<T>>): Promise<Awaited<T>>;
-  /**
-   * A reference to the prototype.
-   */
-  readonly prototype: Promise<any>;
-  /**
-   * Creates a new Promise.
-   * @param executor A callback used to initialize the promise. This callback is passed two arguments:
-   * a resolve callback used to resolve the promise with a value or the result of another promise,
-   * and a reject callback used to reject the promise with a provided reason or error.
-   */
-  new <T>(executor: (resolve: (value: T | PromiseLike<T>) => void, reject: (reason?: any) => void) => void): Promise<T>;
-  /**
-   * Creates a Promise that is resolved with an array of results when all of the provided Promises
-   * resolve, or rejected when any Promise is rejected.
-   * @param values An array of Promises.
-   * @returns A new Promise.
-   */
-  all<T extends readonly unknown[] | []>(values: T): Promise<{
-    [P in keyof T]: Awaited<T[P]>;
-  }>;
-  /**
-   * Creates a Promise that is resolved or rejected when any of the provided Promises are resolved
-   * or rejected.
-   * @param values An array of Promises.
-   * @returns A new Promise.
-   */
-  race<T extends readonly unknown[] | []>(values: T): Promise<Awaited<T[number]>>;
-  /**
-   * Creates a new rejected promise for the provided reason.
-   * @param reason The reason the promise was rejected.
-   * @returns A new rejected Promise.
-   */
-  reject<T = never>(reason?: any): Promise<T>;
-  /**
-   * Creates a new resolved promise.
-   * @returns A resolved promise.
-   */
-  resolve(): Promise<void>;
-  /**
-   * Creates a new resolved promise for the provided value.
-   * @param value A promise.
-   * @returns A promise whose internal state matches the provided promise.
-   */
-  resolve<T>(value: T): Promise<Awaited<T>>;
-  /**
-   * Creates a new resolved promise for the provided value.
-   * @param value A promise.
-   * @returns A promise whose internal state matches the provided promise.
-   */
-  resolve<T>(value: T | PromiseLike<T>): Promise<Awaited<T>>;
-  readonly [Symbol.species]: PromiseConstructor;
-  /**
-   * Creates a Promise that is resolved with an array of results when all
-   * of the provided Promises resolve or reject.
-   * @param values An array of Promises.
-   * @returns A new Promise.
-   */
-  allSettled<T extends readonly unknown[] | []>(values: T): Promise<{
-    [P in keyof T]: PromiseSettledResult<Awaited<T[P]>>;
-  }>;
-  /**
-   * Creates a Promise that is resolved with an array of results when all
-   * of the provided Promises resolve or reject.
-   * @param values An array of Promises.
-   * @returns A new Promise.
-   */
-  allSettled<T>(values: Iterable<T | PromiseLike<T>>): Promise<Array<PromiseSettledResult<Awaited<T>>>>;
-}
-
 export type RemainingArgs<T> = T extends (_: any, ...args: infer U) => any ? U : never;
-
-export interface DateConstructor {
-  /**
-   * Creates a new Date.
-   * @param year The full year designation is required for cross-century date accuracy. If year is between 0 and 99 is used, then year is assumed to be 1900 + year.
-   * @param monthIndex The month as a number between 0 and 11 (January to December).
-   * @param date The date as a number between 1 and 31.
-   * @param hours Must be supplied if minutes is supplied. A number from 0 to 23 (midnight to 11pm) that specifies the hour.
-   * @param minutes Must be supplied if seconds is supplied. A number from 0 to 59 that specifies the minutes.
-   * @param seconds Must be supplied if milliseconds is supplied. A number from 0 to 59 that specifies the seconds.
-   * @param ms A number from 0 to 999 that specifies the milliseconds.
-   */
-  new (): Date;
-  (): string;
-  readonly prototype: Date;
-  /**
-   * Parses a string containing a date, and returns the number of milliseconds between that date and midnight, January 1, 1970.
-   * @param s A date string
-   */
-  parse(s: string): number;
-  /**
-   * Returns the number of milliseconds between midnight, January 1, 1970 Universal Coordinated Time (UTC) (or GMT) and the specified date.
-   * @param year The full year designation is required for cross-century date accuracy. If year is between 0 and 99 is used, then year is assumed to be 1900 + year.
-   * @param monthIndex The month as a number between 0 and 11 (January to December).
-   * @param date The date as a number between 1 and 31.
-   * @param hours Must be supplied if minutes is supplied. A number from 0 to 23 (midnight to 11pm) that specifies the hour.
-   * @param minutes Must be supplied if seconds is supplied. A number from 0 to 59 that specifies the minutes.
-   * @param seconds Must be supplied if milliseconds is supplied. A number from 0 to 59 that specifies the seconds.
-   * @param ms A number from 0 to 999 that specifies the milliseconds.
-   */
-  UTC(year: number, monthIndex: number, date?: number, hours?: number, minutes?: number, seconds?: number, ms?: number): number;
-  /**
-   * Returns the number of milliseconds elapsed since midnight, January 1, 1970 Universal Coordinated Time (UTC).
-   */
-  now(): number;
-  /**
-   * Returns the number of milliseconds between midnight, January 1, 1970 Universal Coordinated Time (UTC) (or GMT) and the specified date.
-   * @param year The full year designation is required for cross-century date accuracy. If year is between 0 and 99 is used, then year is assumed to be 1900 + year.
-   * @param monthIndex The month as a number between 0 and 11 (January to December).
-   * @param date The date as a number between 1 and 31.
-   * @param hours Must be supplied if minutes is supplied. A number from 0 to 23 (midnight to 11pm) that specifies the hour.
-   * @param minutes Must be supplied if seconds is supplied. A number from 0 to 59 that specifies the minutes.
-   * @param seconds Must be supplied if milliseconds is supplied. A number from 0 to 59 that specifies the seconds.
-   * @param ms A number from 0 to 999 that specifies the milliseconds.
-   */
-  UTC(year: number, monthIndex?: number, date?: number, hours?: number, minutes?: number, seconds?: number, ms?: number): number;
-}
 
 /**
  * The context to be transported into the generic components.
@@ -1342,12 +1179,7 @@ export interface BaseRegistration {
   pilet: string;
 }
 
-export type WrappedComponent<TProps> = React.ComponentType<React.PropsWithChildren<Without<TProps, keyof BaseComponentProps>>>;
-
-/**
- * Creates a new function.
- */
-export const Function: FunctionConstructor;
+export type WrappedComponent<TProps> = ComponentType<PropsWithChildren<Without<TProps, keyof BaseComponentProps>>>;
 
 /**
  * The entries representing pilets from a feed service response.
@@ -1364,16 +1196,6 @@ export type PiletEntry = MultiPiletEntry | SinglePiletEntry;
  */
 export interface PiletsLoaded {
   (error: Error | undefined, pilets: Array<Pilet>): void;
-}
-
-export interface PromiseLike<T> {
-  /**
-   * Attaches callbacks for the resolution and/or rejection of the Promise.
-   * @param onfulfilled The callback to execute when the Promise is resolved.
-   * @param onrejected The callback to execute when the Promise is rejected.
-   * @returns A Promise for the completion of which ever callback is executed.
-   */
-  then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): PromiseLike<TResult1 | TResult2>;
 }
 
 /**
@@ -1413,115 +1235,9 @@ export interface MultiPiletApp {
   setup(apiFactory: PiletApiCreator): void | Promise<void>;
 }
 
-export interface SymbolConstructor {
-  /**
-   * A method that returns the default iterator for an object. Called by the semantics of the
-   * for-of statement.
-   */
-  readonly iterator: unique symbol;
-  /**
-   * A reference to the prototype.
-   */
-  readonly prototype: Symbol;
-  /**
-   * Returns a new unique Symbol value.
-   * @param description Description of the new Symbol object.
-   */
-  (description?: string | number): symbol;
-  /**
-   * Returns a Symbol object from the global symbol registry matching the given key if found.
-   * Otherwise, returns a new symbol with this key.
-   * @param key key to search for.
-   */
-  for(key: string): symbol;
-  /**
-   * Returns a key from the global symbol registry matching the given Symbol if found.
-   * Otherwise, returns a undefined.
-   * @param sym Symbol to find the key for.
-   */
-  keyFor(sym: symbol): string | undefined;
-  /**
-   * A method that determines if a constructor object recognizes an object as one of the
-   * constructor’s instances. Called by the semantics of the instanceof operator.
-   */
-  readonly hasInstance: unique symbol;
-  /**
-   * A Boolean value that if true indicates that an object should flatten to its array elements
-   * by Array.prototype.concat.
-   */
-  readonly isConcatSpreadable: unique symbol;
-  /**
-   * A regular expression method that matches the regular expression against a string. Called
-   * by the String.prototype.match method.
-   */
-  readonly match: unique symbol;
-  /**
-   * A regular expression method that replaces matched substrings of a string. Called by the
-   * String.prototype.replace method.
-   */
-  readonly replace: unique symbol;
-  /**
-   * A regular expression method that returns the index within a string that matches the
-   * regular expression. Called by the String.prototype.search method.
-   */
-  readonly search: unique symbol;
-  /**
-   * A function valued property that is the constructor function that is used to create
-   * derived objects.
-   */
-  readonly species: unique symbol;
-  /**
-   * A regular expression method that splits a string at the indices that match the regular
-   * expression. Called by the String.prototype.split method.
-   */
-  readonly split: unique symbol;
-  /**
-   * A method that converts an object to a corresponding primitive value.
-   * Called by the ToPrimitive abstract operation.
-   */
-  readonly toPrimitive: unique symbol;
-  /**
-   * A String value that is used in the creation of the default string description of an object.
-   * Called by the built-in method Object.prototype.toString.
-   */
-  readonly toStringTag: unique symbol;
-  /**
-   * An Object whose truthy properties are properties that are excluded from the 'with'
-   * environment bindings of the associated objects.
-   */
-  readonly unscopables: unique symbol;
-  /**
-   * A method that returns the default async iterator for an object. Called by the semantics of
-   * the for-await-of statement.
-   */
-  readonly asyncIterator: unique symbol;
-  /**
-   * A regular expression method that matches the regular expression against a string. Called
-   * by the String.prototype.matchAll method.
-   */
-  readonly matchAll: unique symbol;
-  readonly dispose: unique symbol;
-  readonly asyncDispose: unique symbol;
-}
-
-export interface Iterator<T, TReturn = any, TNext = any> {
-  next(...[value]: [] | [TNext]): IteratorResult<T, TReturn>;
-  return?(value?: TReturn): IteratorResult<T, TReturn>;
-  throw?(e?: any): IteratorResult<T, TReturn>;
-}
-
 export interface PiralCustomMenuTypes {}
 
 export interface PiralCustomNotificationTypes {}
-
-/**
- * Recursively unwraps the "awaited type" of a type. Non-promise "thenables" should resolve to `never`. This emulates the behavior of `await`.
- */
-export type Awaited<T> = T extends null | undefined ? T : T extends object & {
-  then(onfulfilled: infer F, ...args: infer _): any;
-} ? F extends ((value: infer V, ...args: infer _) => any) ? Awaited<V> : never : T;
-
-export type PromiseSettledResult<T> = PromiseFulfilledResult<T> | PromiseRejectedResult;
 
 export interface NavigationApi {
   /**
@@ -1571,17 +1287,11 @@ export interface NavigationApi {
   publicPath: string;
 }
 
-export type Without<T, K> = Pick<T, Exclude<keyof T, K>>;
+export type PropsWithChildren<P = unknown> = P & {
+  children?: ReactNode | undefined;
+};
 
-export interface FunctionConstructor {
-  /**
-   * Creates a new function.
-   * @param args A list of arguments the function accepts.
-   */
-  new (...args: Array<string>): Function;
-  (...args: Array<string>): Function;
-  readonly prototype: Function;
-}
+export type Without<T, K> = Pick<T, Exclude<keyof T, K>>;
 
 /**
  * The metadata response for a multi pilet.
@@ -1593,18 +1303,6 @@ export type MultiPiletEntry = PiletBundleEntry;
  */
 export type SinglePiletEntry = PiletV0Entry | PiletV1Entry | PiletV2Entry | PiletV3Entry | PiletMfEntry | PiletVxEntry;
 
-export type IteratorResult<T, TReturn = any> = IteratorYieldResult<T> | IteratorReturnResult<TReturn>;
-
-export interface PromiseFulfilledResult<T> {
-  status: "fulfilled";
-  value: T;
-}
-
-export interface PromiseRejectedResult {
-  status: "rejected";
-  reason: any;
-}
-
 export interface NavigationBlocker {
   (tx: NavigationTransition): void;
 }
@@ -1612,18 +1310,6 @@ export interface NavigationBlocker {
 export interface NavigationListener {
   (update: NavigationUpdate): void;
 }
-
-/**
- * From T, pick a set of properties whose keys are in the union K
- */
-export type Pick<T, K extends keyof T> = {
-  [P in K]: T[P];
-};
-
-/**
- * Exclude from T those types that are assignable to U
- */
-export type Exclude<T, U> = T extends U ? never : T;
 
 /**
  * Metadata for pilets using the bundle schema.
@@ -1855,16 +1541,6 @@ export interface PiletVxEntry {
    * Additional shared dependency script files.
    */
   dependencies?: Record<string, string>;
-}
-
-export interface IteratorYieldResult<TYield> {
-  done?: false;
-  value: TYield;
-}
-
-export interface IteratorReturnResult<TReturn> {
-  done: true;
-  value: TReturn;
 }
 
 export interface NavigationTransition extends NavigationUpdate {
