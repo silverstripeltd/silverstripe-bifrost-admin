@@ -1,21 +1,21 @@
 System.register(["react", "react-router-dom"], function (_export, _context) {
   "use strict";
 
-  var o, e, p;
+  var a, t, p;
   return {
     setters: [function (_react) {
-      o = _react;
+      a = _react;
     }, function (_reactRouterDom) {
-      e = _reactRouterDom.Link;
+      t = _reactRouterDom.Link;
     }],
     execute: function () {
       _export("default", p = _ref => {
         let {
-          match: t,
-          location: a
+          match: e,
+          location: o
         } = _ref;
-        return o.createElement(o.Fragment, null, o.createElement("h1", null, "Manage ", t.params.engineName), o.createElement("ul", null, o.createElement("li", null, o.createElement(e, {
-          to: `${a.pathname}/synonyms`
+        return a.createElement(a.Fragment, null, a.createElement("h1", null, "Manage ", e.params.engineName), a.createElement("ul", null, a.createElement("li", null, a.createElement(t, {
+          to: `${o.pathname}/synonyms`
         }, "Synonyms"))));
       });
     }

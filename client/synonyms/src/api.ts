@@ -1,3 +1,5 @@
+import { ApiError, ForbiddenError, JsonError } from "silverstripe-search-admin";
+
 interface DeletedRuleResponse {
     status: string
 }
@@ -23,6 +25,25 @@ export type CMSApiConfig = {
     apiBase: string;
 };
 
+async function handleResponse<T>(response: Response): Promise<T> {
+    if (!response.ok) {
+        const body = await response.text();
+        switch(response.status) {
+            case 401:
+            case 403:
+                throw new ForbiddenError(response.status, 'Action not allowed', body)
+            default:
+                throw new ApiError(response.status, 'Error with API request', body);
+        }
+    }
+    try {
+        return response.json();
+    } catch (e) {
+        const body = await response.text();
+        throw new JsonError(400, e.message, body)
+    }
+}
+
 export function createCMSApi(config: CMSApiConfig): CMSApi {
     return {
         async getSynonyms(engine: string): Promise<Array<SynonymRule>> {
@@ -33,7 +54,7 @@ export function createCMSApi(config: CMSApiConfig): CMSApi {
             endpoint.searchParams.set("engine", engine);
             const response = await fetch(endpoint);
 
-            return response.json();
+            return handleResponse<Array<SynonymRule>>(response);
         },
         async addSynonymRule(
             engine: string,
@@ -53,7 +74,7 @@ export function createCMSApi(config: CMSApiConfig): CMSApi {
 
             const response = await fetch(request);
 
-            return response.json();
+            return handleResponse<SynonymRule>(response);
         },
         async updateSynonymRule(engine:string, rule: SynonymRule): Promise<SynonymRule> {
             const endpoint = new URL(
@@ -70,7 +91,7 @@ export function createCMSApi(config: CMSApiConfig): CMSApi {
 
             const response = await fetch(request);
 
-            return response.json();
+            return handleResponse<SynonymRule>(response);
         },
         async deleteSynonymRule(
             engine: string,
@@ -89,7 +110,7 @@ export function createCMSApi(config: CMSApiConfig): CMSApi {
 
             const response = await fetch(request);
 
-            return response.json();
+            return handleResponse<DeletedRuleResponse>(response);
         },
     };
 }

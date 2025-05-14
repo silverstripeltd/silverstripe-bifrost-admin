@@ -3550,8 +3550,8 @@ __metadata:
 
 "silverstripe-search-admin@file:../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz::locator=landing%40workspace%3A.":
   version: 1.0.0
-  resolution: "silverstripe-search-admin@file:../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz#../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz::hash=d4d308&locator=landing%40workspace%3A."
-  checksum: 10c0/fa3b791a80bb7dbb4172a6d612ed25fe47bf01b68e46d3ec2d8ee6002610679388c44588e4e2cb87e2d508117748661354fb006bd206730a286ec1a2324cdab6
+  resolution: "silverstripe-search-admin@file:../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz#../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz::hash=4e936a&locator=landing%40workspace%3A."
+  checksum: 10c0/ade205770f7bb6162432a96020bc540cd40f0b59589847974ce7694ed37071c8b04eb76a7855ca4f86cdf890814d3c0d5afa9155f89ade7166ec92760ea81a90
   languageName: node
   linkType: hard
 

@@ -9,6 +9,7 @@
     "@types/node": "latest",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react-modal": "^3",
     "formik": "^2.4.6",
     "piral-cli": "^1.8.5",
     "piral-cli-esbuild": "^1",
@@ -32,8 +33,8 @@
   },
   "scripts": {
     "start": "pilet debug",
-    "build": "pilet build --fresh",
-    "watch": "pilet debug",
+    "build": "pilet build",
+    "release": "pilet build --fresh",
     "upgrade": "pilet upgrade",
     "postinstall": "pilet declaration"
   },

@@ -2,7 +2,6 @@ import * as React from 'react';
 import { createRoot } from 'react-dom/client';
 import { createInstance, Piral, createStandardApi } from 'piral';
 import { layout, errors } from './layout';
-import {createCMSApi} from './api/cms';
 
 // TODO pass configuration in rather than hard coding references here
 const apiBase = 'admin/silverstripesearch/api/v1';
@@ -13,7 +12,7 @@ const instance = createInstance({
     components: layout,
     errorComponents: errors,
   },
-  plugins: [...createStandardApi(), createCMSApi({apiBase})],
+  plugins: [...createStandardApi()],
   requestPilets() {
     return fetch(feedUrl)
       .then((res) => res.json())
@@ -21,6 +20,6 @@ const instance = createInstance({
   },
 });
 
-const root = createRoot(document.querySelector('.SilvestripeSearchAdmin'));
+const root = createRoot(document.querySelector('.SilverstripeSearchAdmin'));
 
 root.render(<Piral instance={instance} />);

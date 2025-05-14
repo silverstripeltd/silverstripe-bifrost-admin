@@ -5,6 +5,7 @@ import { useState } from "react";
 import { SynonymRule, CMSApi } from "./api";
 import { AddForm } from "./AddForm";
 import { EditForm } from "./EditForm";
+import { ForbiddenError } from "silverstripe-search-admin";
 
 interface PageProps {
     api: CMSApi;
@@ -14,10 +15,21 @@ interface PageProps {
 
 export default ({ api, match }: PageProps) => {
     const [synonymRules, setSynonymRules] = useState([]);
+    const [apiError, setApiError] = useState('');
     const engine = match.params.engineName;
     const refresh = () => {
+        setApiError('');
         api.getSynonyms(engine).then((resp: Array<SynonymRule>) => {
             setSynonymRules(resp);
+            setApiError('');
+        })
+        .catch((e) => {
+            console.error(e);
+            if (e instanceof ForbiddenError) {
+                setApiError("You don't have permission to view this content");
+            } else {
+                setApiError('Error fetching synonyms');
+            }
         });
     };
 
@@ -30,6 +42,14 @@ export default ({ api, match }: PageProps) => {
     const removeRule = (id: string) => {
         api.deleteSynonymRule(engine, id).then(() => {
             refresh();
+        })
+        .catch((e) => {
+            console.error(e);
+            if (e instanceof ForbiddenError) {
+                setApiError("You don't have permission to delete a synonym");
+            } else {
+                setApiError('Error deleting synonym');
+            }
         });
     };
 
@@ -37,7 +57,7 @@ export default ({ api, match }: PageProps) => {
         return api.updateSynonymRule(engine, rule).then((rule) => {
             refresh();
             return rule;
-        });
+        })
     };
 
     function renderRules(rules: Array<SynonymRule>) {
@@ -71,6 +91,7 @@ export default ({ api, match }: PageProps) => {
             />
 
             <h2>Synonyms:</h2>
+            {(apiError ? <p className="alert alert-danger">{apiError}</p>: null)}
             <ul className="list-group">{renderRules(synonymRules)}</ul>
         </>
     );

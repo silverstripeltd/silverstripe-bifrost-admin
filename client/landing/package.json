@@ -30,7 +30,7 @@
   "scripts": {
     "start": "pilet debug",
     "build": "pilet build",
-    "watch": "pilet build --watch",
+    "release": "pilet build --fresh",
     "upgrade": "pilet upgrade",
     "postinstall": "pilet declaration"
   },

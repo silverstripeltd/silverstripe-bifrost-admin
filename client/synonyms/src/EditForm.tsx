@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import ReactModal from "react-modal";
 import { SynonymRule } from "./api";
 import { BaseForm, UpdateFormValues } from "./BaseForm";
+import { ForbiddenError } from "silverstripe-search-admin";
 
 interface EditFormProps {
     update: (rule: SynonymRule) => Promise<SynonymRule>;
@@ -11,6 +12,11 @@ interface EditFormProps {
 
 export const EditForm = ({ update, onClose, initialValues }: EditFormProps) => {
     const [open, setOpen] = useState(false);
+    const [apiError, setApiError] = useState('');
+    const closeModal = () => {
+        setOpen(false);
+        setApiError('');
+    }
     const submit = (values: UpdateFormValues, { setSubmitting }) => {
         const id = values.id;
         const type = values.type;
@@ -28,21 +34,26 @@ export const EditForm = ({ update, onClose, initialValues }: EditFormProps) => {
         update(rule)
             .then(() => {
                 setSubmitting(false);
-                setOpen(false);
+                closeModal()
                 onClose();
             })
             .catch((e) => {
                 console.error(e);
                 setSubmitting(false);
+                if (e instanceof ForbiddenError) {
+                    setApiError("You don't have permission to edit a synonym");
+                } else {
+                    setApiError('Error fetching synonyms');
+                }
             });
     };
 
     return (
         <>
-            <button className="btn btn-outline-info" onClick={() => setOpen(!open)}>Edit</button>
+            <button className="btn btn-outline-info" onClick={() => setOpen(true)}>Edit</button>
             <ReactModal
                 isOpen={open}
-                onRequestClose={() => setOpen(false)}
+                onRequestClose={closeModal}
                 style={{
                     overlay: {
                         zIndex: 100,
@@ -50,6 +61,7 @@ export const EditForm = ({ update, onClose, initialValues }: EditFormProps) => {
                 }}
             >
                 <h3>Edit synonym</h3>
+                {(apiError ? <p className="alert alert-danger">{apiError}</p>: null)}
                 <BaseForm onSubmit={submit} initialValues={initialValues} />
             </ReactModal>
         </>

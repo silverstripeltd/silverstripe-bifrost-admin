@@ -1,4 +1,4 @@
-SilverstripeSearch\Admin\SilvestripeSearchAdmin:
+SilverstripeSearch\Admin\SilverstripeSearchAdmin:
     pilets:
         - name: 'synonyms'
           version: 1

@@ -1,31 +1,72 @@
 //@pilet v:2(esbuildpr_landing,{})
-System.register(["react", "react-router-dom"], function (_export, _context) {
+System.register(["react", "react-router-dom", "silverstripe-search-admin"], function (_export, _context) {
   "use strict";
 
-  var i, a, p;
-  function l(e) {
-    e.registerPage("/engine/:engineName", p), e.getEngines().then(t => {
-      t.map(n => {
-        e.registerTile(() => i.createElement("div", {
+  var n, m, g, a, c, p, l;
+  function r(t) {
+    return {
+      async getEngines() {
+        let o = `${t.apiBase}/engines`,
+          e = await fetch(o);
+        if (!e.ok) {
+          let i = await e.text();
+          switch (e.status) {
+            case 401:
+            case 403:
+              throw new c(e.status, "Action not allowed", i);
+            default:
+              throw new a(e.status, "Error with API request", i);
+          }
+        }
+        try {
+          return e.json();
+        } catch (i) {
+          let s = await e.text();
+          throw new p(400, i.message, s);
+        }
+      }
+    };
+  }
+  function J(t) {
+    t.registerPage("/engine/:engineName", l), r({
+      apiBase: t.meta.config.apiBase
+    }).getEngines().then(e => {
+      e.map(i => {
+        t.registerTile(() => n.createElement("div", {
           className: "engine"
-        }, i.createElement(a, {
-          to: `engine/${n}`
-        }, n), i.createElement("p", null, "Manage engine")), {
+        }, n.createElement(m, {
+          to: `engine/${i}`
+        }, i), n.createElement("p", null, "Manage engine")), {
           initialColumns: 2,
           initialRows: 2
         });
       });
+    }).catch(e => {
+      console.error(e);
+      let i = `Error fetching information about your search
+                            subscription. Please check the module installation.`;
+      e instanceof g && (i = "You do not have permission to access this content. Please check your permissions and/or API key configuration"), t.registerTile(() => n.createElement("div", {
+        className: "engine"
+      }, n.createElement("p", null, i)), {
+        initialColumns: 2,
+        initialRows: 2
+      });
     });
   }
-  _export("setup", l);
+  _export("setup", J);
   return {
     setters: [function (_react) {
-      i = _react.default;
+      n = _react.default;
     }, function (_reactRouterDom) {
-      a = _reactRouterDom.Link;
+      m = _reactRouterDom.Link;
+    }, function (_silverstripeSearchAdmin) {
+      g = _silverstripeSearchAdmin.ForbiddenError;
+      a = _silverstripeSearchAdmin.ApiError;
+      c = _silverstripeSearchAdmin.ForbiddenError;
+      p = _silverstripeSearchAdmin.JsonError;
     }],
     execute: function () {
-      p = i.lazy(() => _context.import("./Page-X5SQQDWR.js"));
+      l = n.lazy(() => _context.import("./Page-ASQYROCA.js"));
       (function () {
         var d = document;
         var __bundleUrl__ = function () {

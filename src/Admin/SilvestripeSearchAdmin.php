@@ -2,22 +2,23 @@
 
 namespace SilverstripeSearch\Admin;
 
-use Http\Client\Exception\HttpException;
 use SilverStripe\Admin\LeftAndMain;
+use SilverStripe\CMS\Controllers\CMSMain;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
-use SilverStripe\Control\HTTPResponse;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Core\Manifest\ModuleResourceLoader;
 use SilverStripe\Forager\Interfaces\IndexingInterface;
 use SilverStripe\Forager\Service\IndexConfiguration;
-use SilverStripe\Discoverer\Service\SearchService;
 use SilverStripe\Forager\Service\Query\SynonymRule as QuerySynonymRule;
 use SilverStripe\Forager\Service\Results\SynonymRule;
 use SilverStripe\Forager\Service\SynonymService;
+use SilverStripe\Security\Permission;
+use SilverStripe\Security\PermissionProvider;
+use SilverStripe\Security\Security;
 use stdClass;
 
-class SilvestripeSearchAdmin extends LeftAndMain
+class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 {
     private static $url_segment = "silverstripesearch";
     private static $menu_title  = "Silverstripe Search Admin";
@@ -49,6 +50,39 @@ class SilvestripeSearchAdmin extends LeftAndMain
     ];
 
     private static array $pilets = [];
+
+    private static string $required_permission_codes = self::SILVERSTRIPE_SEARCH_PERMISSION_ACCESS;
+
+    public const SILVERSTRIPE_SEARCH_VIEW_SYNONYMS = 'SILVERSTRIPE_SEARCH_VIEW_SYNONYMS';
+    public const SILVERSTRIPE_SEARCH_EDIT_SYNONYMS = 'SILVERSTRIPE_SEARCH_EDIT_SYNONYMS';
+    public const SILVERSTRIPE_SEARCH_PERMISSION_ACCESS = 'CMS_ACCESS_SilverstripeSearchAdmin';
+
+
+    public function providePermissions()
+    {
+        return [
+            self::SILVERSTRIPE_SEARCH_VIEW_SYNONYMS => [
+                'name' => 'View synonyms',
+                'category' => 'Silverstripe Search',
+            ],
+            self::SILVERSTRIPE_SEARCH_EDIT_SYNONYMS => [
+                'name' => 'Edit synonyms',
+                'category' => 'Silverstripe Search',
+            ],
+            self::SILVERSTRIPE_SEARCH_PERMISSION_ACCESS => [
+                'name' => _t(
+                    CMSMain::class . '.ACCESS',
+                    "Access to '{title}' section",
+                    ['title' => $this->menu_title()]
+                ),
+                'category' => _t(Permission::class . '.CMS_ACCESS_CATEGORY', 'CMS Access'),
+                'help' => _t(
+                    self::class . '.ACCESS_HELP',
+                    'Allow viewing of search configuration and status, and links to external resources.'
+                ),
+            ],
+        ];
+    }
 
     public function pilets(HTTPRequest $request)
     {
@@ -82,6 +116,10 @@ class SilvestripeSearchAdmin extends LeftAndMain
 
     public function engines(HTTPRequest $request): string
     {
+        if ($this->viewCheck()) {
+            return $this->jsonError(403, "You do not have permission for this endpoint");
+        }
+
         $config = IndexConfiguration::singleton();
         $engines = $config->getIndexes();
 
@@ -90,9 +128,8 @@ class SilvestripeSearchAdmin extends LeftAndMain
 
         $output = [];
         foreach ($engines as $name => $configuration) {
-
             $indexName = $indexService->environmentizeIndex($name);
-            $output []= $indexName;
+            $output [] = $indexName;
         }
 
         return json_encode($output);
@@ -100,6 +137,10 @@ class SilvestripeSearchAdmin extends LeftAndMain
 
     public function getSynonyms(HTTPRequest $request): string
     {
+        if ($this->viewCheck()) {
+            return $this->jsonError(403, "You do not have permission for this endpoint");
+        }
+
         $engine = $request->getVar('engine');
         $service = SynonymService::singleton();
 
@@ -110,6 +151,10 @@ class SilvestripeSearchAdmin extends LeftAndMain
 
     public function createSynonymRule(HTTPRequest $request): string
     {
+        if ($this->editCheck()) {
+            return $this->jsonError(403, "You do not have permission for this endpoint");
+        }
+
         $engine = $request->param('Engine');
         $data = json_decode($request->getBody());
 
@@ -150,6 +195,10 @@ class SilvestripeSearchAdmin extends LeftAndMain
 
     public function updateSynonymRule(HTTPRequest $request): string
     {
+        if ($this->editCheck()) {
+            return $this->jsonError(403, "You do not have permission for this endpoint");
+        }
+
         $engine = $request->param('Engine');
         $id = $request->param('ID');
         $data = json_decode($request->getBody());
@@ -195,6 +244,10 @@ class SilvestripeSearchAdmin extends LeftAndMain
 
     public function deleteSynonymRule(HTTPRequest $request): string
     {
+        if ($this->editCheck()) {
+            return $this->jsonError(403, "You do not have permission for this endpoint");
+        }
+
         $engine = $request->param('Engine');
         $id = $request->param('ID');
 
@@ -208,5 +261,15 @@ class SilvestripeSearchAdmin extends LeftAndMain
         return json_encode([
             'status' => 'success'
         ]);
+    }
+
+    private function viewCheck(): bool
+    {
+        return !Permission::check(self::SILVERSTRIPE_SEARCH_VIEW_SYNONYMS);
+    }
+
+    private function editCheck(): bool
+    {
+        return !Permission::check(self::SILVERSTRIPE_SEARCH_EDIT_SYNONYMS);
     }
 }

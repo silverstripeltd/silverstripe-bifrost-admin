@@ -1,64 +1,91 @@
 //@pilet v:2(esbuildpr_synonyms,{})
-System.register(["react"], function (_export, _context) {
+System.register(["react", "silverstripe-search-admin"], function (_export, _context) {
   "use strict";
 
-  var i, y;
-  function a(t) {
+  var a, m, p, u, c;
+  async function r(e) {
+    if (!e.ok) {
+      let n = await e.text();
+      switch (e.status) {
+        case 401:
+        case 403:
+          throw new p(e.status, "Action not allowed", n);
+        default:
+          throw new m(e.status, "Error with API request", n);
+      }
+    }
+    try {
+      return e.json();
+    } catch (n) {
+      let t = await e.text();
+      throw new u(400, n.message, t);
+    }
+  }
+  function y(e) {
     return {
       async getSynonyms(n) {
-        let e = new URL(`${t.apiBase}/synonyms`, window.location.origin);
-        return e.searchParams.set("engine", n), (await fetch(e)).json();
+        let t = new URL(`${e.apiBase}/synonyms`, window.location.origin);
+        t.searchParams.set("engine", n);
+        let o = await fetch(t);
+        return r(o);
       },
-      async addSynonymRule(n, e) {
-        let s = new URL(`${t.apiBase}/${n}/synonyms`, window.location.origin),
-          o = new Request(s, {
+      async addSynonymRule(n, t) {
+        let o = new URL(`${e.apiBase}/${n}/synonyms`, window.location.origin),
+          i = new Request(o, {
             method: "POST",
-            body: JSON.stringify(e),
+            body: JSON.stringify(t),
             headers: {
               "Content-Type": "application/json"
             }
-          });
-        return (await fetch(o)).json();
+          }),
+          s = await fetch(i);
+        return r(s);
       },
-      async updateSynonymRule(n, e) {
-        let s = new URL(`${t.apiBase}/${n}/synonyms/${e.id}`, window.location.origin),
-          o = new Request(s, {
+      async updateSynonymRule(n, t) {
+        let o = new URL(`${e.apiBase}/${n}/synonyms/${t.id}`, window.location.origin),
+          i = new Request(o, {
             method: "PATCH",
-            body: JSON.stringify(e),
+            body: JSON.stringify(t),
             headers: {
               "Content-Type": "application/json"
             }
-          });
-        return (await fetch(o)).json();
+          }),
+          s = await fetch(i);
+        return r(s);
       },
-      async deleteSynonymRule(n, e) {
-        let s = new URL(`${t.apiBase}/${n}/synonyms/${e}`, window.location.origin),
-          o = new Request(s, {
+      async deleteSynonymRule(n, t) {
+        let o = new URL(`${e.apiBase}/${n}/synonyms/${t}`, window.location.origin),
+          i = new Request(o, {
             method: "DELETE",
             headers: {
               "Content-Type": "application/json"
             }
-          });
-        return (await fetch(o)).json();
+          }),
+          s = await fetch(i);
+        return r(s);
       }
     };
   }
-  function d(t) {
-    let n = a({
-      apiBase: t.meta.config.apiBase
+  function f(e) {
+    let n = y({
+      apiBase: e.meta.config.apiBase
     });
-    t.registerPage("/engine/:engineName/synonyms", e => i.createElement(y, {
+    e.registerPage("/engine/:engineName/synonyms", t => a.createElement(c, {
       api: n,
-      ...e
+      ...t
     }));
   }
-  _export("setup", d);
+  _export("setup", f);
   return {
     setters: [function (_react) {
-      i = _react;
+      a = _react;
+    }, function (_silverstripeSearchAdmin) {
+      m = _silverstripeSearchAdmin.ApiError;
+      p = _silverstripeSearchAdmin.ForbiddenError;
+      u = _silverstripeSearchAdmin.JsonError;
     }],
     execute: function () {
-      y = i.lazy(() => _context.import("./Page-HQ73IIVS.js"));
+      c = a.lazy(() => _context.import("./Page-6UU7USF7.js"));
       (function () {
         var d = document;
         var __bundleUrl__ = function () {

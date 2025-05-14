@@ -12,5 +12,6 @@
     "preUpgrade": "",
     "postUpgrade": "",
     "packageOverrides": {}
-  }
+  },
+  "shared": ["./src/errors/index.ts"]
 }
