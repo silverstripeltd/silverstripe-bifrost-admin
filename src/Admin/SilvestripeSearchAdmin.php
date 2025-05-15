@@ -51,7 +51,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 
     private static array $pilets = [];
 
-    private static string $required_permission_codes = self::SILVERSTRIPE_SEARCH_PERMISSION_ACCESS;
+    private static string $required_permission_codes = SilverstripeSearchAdmin::SILVERSTRIPE_SEARCH_PERMISSION_ACCESS;
 
     public const SILVERSTRIPE_SEARCH_VIEW_SYNONYMS = 'SILVERSTRIPE_SEARCH_VIEW_SYNONYMS';
     public const SILVERSTRIPE_SEARCH_EDIT_SYNONYMS = 'SILVERSTRIPE_SEARCH_EDIT_SYNONYMS';
@@ -61,15 +61,15 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     public function providePermissions()
     {
         return [
-            self::SILVERSTRIPE_SEARCH_VIEW_SYNONYMS => [
+            SilverstripeSearchAdmin::SILVERSTRIPE_SEARCH_VIEW_SYNONYMS => [
                 'name' => 'View synonyms',
                 'category' => 'Silverstripe Search',
             ],
-            self::SILVERSTRIPE_SEARCH_EDIT_SYNONYMS => [
+            SilverstripeSearchAdmin::SILVERSTRIPE_SEARCH_EDIT_SYNONYMS => [
                 'name' => 'Edit synonyms',
                 'category' => 'Silverstripe Search',
             ],
-            self::SILVERSTRIPE_SEARCH_PERMISSION_ACCESS => [
+            SilverstripeSearchAdmin::SILVERSTRIPE_SEARCH_PERMISSION_ACCESS => [
                 'name' => _t(
                     CMSMain::class . '.ACCESS',
                     "Access to '{title}' section",
@@ -77,7 +77,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 ),
                 'category' => _t(Permission::class . '.CMS_ACCESS_CATEGORY', 'CMS Access'),
                 'help' => _t(
-                    self::class . '.ACCESS_HELP',
+                    SilverstripeSearchAdmin::class . '.ACCESS_HELP',
                     'Allow viewing of search configuration and status, and links to external resources.'
                 ),
             ],
@@ -265,11 +265,11 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 
     private function viewCheck(): bool
     {
-        return !Permission::check(self::SILVERSTRIPE_SEARCH_VIEW_SYNONYMS);
+        return !Permission::check(SilverstripeSearchAdmin::SILVERSTRIPE_SEARCH_VIEW_SYNONYMS);
     }
 
     private function editCheck(): bool
     {
-        return !Permission::check(self::SILVERSTRIPE_SEARCH_EDIT_SYNONYMS);
+        return !Permission::check(SilverstripeSearchAdmin::SILVERSTRIPE_SEARCH_EDIT_SYNONYMS);
     }
 }
