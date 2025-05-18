@@ -1,11 +1,16 @@
+# Default OS files
+.DS_Store
+
+# Dependencies
 node_modules/
 /vendor/
-.DS_Store
 composer.lock
+
+# Build files
+public/
 *.js.map
 *.css.map
 yarn-error.log
-.vscode/
 .pnp.*
 .yarn/
 !.yarn/patches
@@ -13,4 +18,7 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-public/
+
+# IDE
+.vscode/
+.idea/

@@ -1,3 +1,6 @@
+---
+Name: silverstripe-bifrost-admin
+---
 SilverstripeSearch\Admin\SilverstripeSearchAdmin:
     pilets:
         - name: 'synonyms'
