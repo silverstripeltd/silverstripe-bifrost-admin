@@ -85,7 +85,7 @@ System.register(["react", "silverstripe-search-admin"], function (_export, _cont
       u = _silverstripeSearchAdmin.JsonError;
     }],
     execute: function () {
-      c = a.lazy(() => _context.import("./Page-6UU7USF7.js"));
+      c = a.lazy(() => _context.import("./Page-5WKZONHS.js"));
       (function () {
         var d = document;
         var __bundleUrl__ = function () {

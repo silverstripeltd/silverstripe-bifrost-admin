@@ -6,6 +6,7 @@ import { SynonymRule, CMSApi } from "./api";
 import { AddForm } from "./AddForm";
 import { EditForm } from "./EditForm";
 import { ForbiddenError } from "silverstripe-search-admin";
+import { RemoveConfirm } from "./RemoveConfirm";
 
 interface PageProps {
     api: CMSApi;
@@ -39,18 +40,8 @@ export default ({ api, match }: PageProps) => {
 
     const addRule = api.addSynonymRule.bind(null, engine);
 
-    const removeRule = (id: string) => {
-        api.deleteSynonymRule(engine, id).then(() => {
-            refresh();
-        })
-        .catch((e) => {
-            console.error(e);
-            if (e instanceof ForbiddenError) {
-                setApiError("You don't have permission to delete a synonym");
-            } else {
-                setApiError('Error deleting synonym');
-            }
-        });
+    const removeRule = (id: string): Promise<any> => {
+        return api.deleteSynonymRule(engine, id)
     };
 
     const updateRule = (rule: SynonymRule): Promise<SynonymRule> => {
@@ -76,7 +67,7 @@ export default ({ api, match }: PageProps) => {
                         type: rule.type,
                     }}
                 />
-                <button className="btn btn-outline-danger" onClick={() => removeRule(rule.id)}>delete</button>
+                <RemoveConfirm id={rule.id} remove={removeRule} onClose={refresh}/>
             </li>
         )});
     }
