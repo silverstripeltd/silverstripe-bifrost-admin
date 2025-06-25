@@ -13,7 +13,7 @@ export interface CMSApi {
 
 export interface SynonymRuleInput {
     type: string;
-    root: string[];
+    root?: string[];
     synonyms: string[];
 }
 

@@ -13,5 +13,5 @@
     "postUpgrade": "",
     "packageOverrides": {}
   },
-  "shared": ["./src/errors/index.ts"]
+  "shared": ["./src/errors/index.ts", "./src/logo.tsx"]
 }

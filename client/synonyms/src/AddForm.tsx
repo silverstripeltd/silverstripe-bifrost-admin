@@ -1,37 +1,51 @@
-import React, { useState } from "react";
+import React, { ReactNode, useState } from "react";
 import ReactModal from "react-modal";
 import { SynonymRule, SynonymRuleInput } from "./api";
 import { BaseForm, CreateFormValues } from "./BaseForm";
 import { ForbiddenError } from "silverstripe-search-admin";
-
+import styles from './form.module.css';
+import btnStyles from "./buttons.module.css";
 interface AddFormProps {
     add: (rule: SynonymRuleInput) => Promise<SynonymRule>;
     onClose: Function;
+    buttonClasses?: string;
+    text?: ReactNode;
 }
 
-export const AddForm = ({ add, onClose }: AddFormProps) => {
+export const AddForm = ({
+    add,
+    onClose,
+    buttonClasses = "btn btn-primary",
+    text = (
+        <span className="vertical-align-items">
+            <i
+                style={{ lineHeight: "10px", marginRight: "0.5rem", fontSize: "1.2rem" }}
+                className="font-icon-plus"
+            />
+            Create a synonym set
+        </span>
+    ),
+}: AddFormProps) => {
     const [open, setOpen] = useState(false);
-    const [apiError, setApiError] = useState('');
+    const [apiError, setApiError] = useState("");
     const closeModal = () => {
         setOpen(false);
-        setApiError('');
-    }
+        setApiError("");
+    };
     const submit = (values: CreateFormValues, { setSubmitting }) => {
         const type = values.type;
-        const synonyms = values.synonyms.split(/\r?\n/g);
-        const root = values.root.split(/\r?\n/g);
+        const synonyms = values.synonyms;
 
         const rule: SynonymRuleInput = {
             type,
             synonyms,
-            root,
         };
 
         setSubmitting(true);
         add(rule)
             .then(() => {
                 setSubmitting(false);
-                closeModal()
+                closeModal();
                 onClose();
             })
             .catch((e) => {
@@ -39,28 +53,45 @@ export const AddForm = ({ add, onClose }: AddFormProps) => {
                 setSubmitting(false);
 
                 if (e instanceof ForbiddenError) {
-                    setApiError("You don't have permission to create a synonym");
+                    setApiError(
+                        "You don't have permission to create a synonym"
+                    );
                 } else {
-                    setApiError('Error fetching synonyms');
+                    setApiError("Error fetching synonyms");
                 }
-            })
+            });
     };
 
+    const appElement = window.document.querySelector<HTMLElement>('.cms-container')
     return (
         <>
-            <button className="btn btn-info" onClick={() => setOpen(true)}>Add synonym</button>
+            <button className={buttonClasses} onClick={() => setOpen(true)}>
+                {text}
+            </button>
             <ReactModal
+                appElement={appElement}
+                portalClassName="silverstripe-search-admin__modal"
                 isOpen={open}
                 onRequestClose={closeModal}
-                style={{
-                    overlay: {
-                        zIndex: 100,
-                    },
-                }}
+                className={styles.modal}
+                overlayClassName={styles.overlay}
             >
-                <h3>Add a synonym</h3>
-                {(apiError ? <p className="alert alert-danger">{apiError}</p>: null)}
+                <div className={styles.header}>
+                    <h3 className={styles.title}>Add a synonym</h3>
+                    <button
+                        className={btnStyles.iconButton}
+                        onClick={closeModal}
+                        aria-label="close"
+                    >
+                        <i className="font-icon-cancel"></i>
+                    </button>
+                </div>
+                {apiError ? (
+                    <p className="alert alert-danger">{apiError}</p>
+                ) : null}
+
                 <BaseForm onSubmit={submit} />
+
             </ReactModal>
         </>
     );

@@ -12,7 +12,7 @@ const instance = createInstance({
     components: layout,
     errorComponents: errors,
   },
-  plugins: [...createStandardApi()],
+  plugins: [...createStandardApi({dashboard: false})],
   requestPilets() {
     return fetch(feedUrl)
       .then((res) => res.json())

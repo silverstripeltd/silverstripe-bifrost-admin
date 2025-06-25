@@ -13,6 +13,7 @@ use SilverStripe\Forager\Service\IndexConfiguration;
 use SilverStripe\Forager\Service\Query\SynonymRule as QuerySynonymRule;
 use SilverStripe\Forager\Service\Results\SynonymRule;
 use SilverStripe\Forager\Service\SynonymService;
+use SilverStripe\ForagerElasticEnterprise\Service\EnterpriseSearchService;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\Security\Security;
@@ -21,7 +22,10 @@ use stdClass;
 class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 {
     private static $url_segment = "silverstripesearch";
-    private static $menu_title  = "Silverstripe Search Admin";
+
+    private static $menu_title  = "Silverstripe Search";
+
+    private static $menu_icon_class  = "font-icon-search";
 
     private static $extra_requirements_javascript = [
         'silverstripe/silverstripe-bifrost-admin:client/base/dist/release/main.js',
@@ -29,6 +33,8 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 
     private static $extra_requirements_css = [
         'silverstripe/silverstripe-bifrost-admin:client/base/dist/release/style.css',
+        'silverstripe/silverstripe-bifrost-admin:client/base/dist/release/main.css',
+        'silverstripe/silverstripe-bifrost-admin:client/base/dist/release/main.css',
     ];
 
     private static array $allowed_actions = [
@@ -38,6 +44,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         'createSynonymRule',
         'deleteSynonymRule',
         'updateSynonymRule',
+        'getSchema',
     ];
 
     private static $url_handlers = [
@@ -47,6 +54,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         'POST api/v1/$Engine/synonyms' => 'createSynonymRule',
         'DELETE api/v1/$Engine/synonyms/$ID' => 'deleteSynonymRule',
         'PATCH api/v1/$Engine/synonyms/$ID' => 'updateSynonymRule',
+        'GET api/v1/schema' => 'getSchema',
     ];
 
     private static array $pilets = [];
@@ -129,9 +137,47 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         $output = [];
         foreach ($engines as $name => $configuration) {
             $indexName = $indexService->environmentizeIndex($name);
-            $output [] = $indexName;
+            $totalDocs = $indexService->getDocumentTotal($name);
+            $engine = new stdClass();
+            $engine->name = $indexName;
+            $engine->totalDocs = $totalDocs;
+
+            $output [] = $engine;
         }
 
+        return json_encode($output);
+    }
+
+    public function getSchema(HTTPRequest $request): string
+    {
+        if ($this->viewCheck()) {
+            return $this->jsonError(403, "You do not have permission for this endpoint");
+        }
+        $output = new stdClass();
+
+        $fullIndexName = $request->getVar('index');
+
+        if (!$fullIndexName) {
+            return json_encode($output);
+        }
+        $variant = IndexConfiguration::singleton()->getIndexVariant();
+        $prefix = sprintf('%s-', $variant);
+        $indexName = str_replace($prefix, '', $fullIndexName);
+
+        if (!array_key_exists($indexName, IndexConfiguration::singleton()->getIndexes())) {
+            return $this->jsonError(400, "Can't find index");
+        }
+
+        /** @var EnterpriseSearchService $indexService */
+        $indexService = Injector::inst()->get(IndexingInterface::class);
+
+        $fields = $indexService->getConfiguration()->getFieldsForIndex($indexName);
+
+        foreach ($fields as $field) {
+            $explicitFieldType = $field->getOption('type') ?? $indexService->config()->get('default_field_type');
+            $output->{$field->getSearchFieldName()} = $explicitFieldType;
+        }
+        // Fetch the Schema, as it is currently configured in our application
         return json_encode($output);
     }
 

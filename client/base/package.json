@@ -22,7 +22,7 @@
     "start": "piral debug",
     "build": "piral build --public-url 'admin/silverstripesearch/'",
     "release": "piral build --public-url 'admin/silverstripesearch/' --fresh",
-    "watch": "piral build --watch  --no-minify --public-url 'admin/silverstripesearch/'",
+    "watch": "SS_ENV=dev && piral build --optimize-modules true --source-maps true --type release --watch  --no-minify --public-url 'admin/silverstripesearch/'",
     "postinstall": "piral declaration"
   },
   "types": "dist/index.d.ts",
@@ -44,8 +44,10 @@
     "@types/react-modal": "^3",
     "@types/react-router": "^5",
     "@types/react-router-dom": "^5",
+    "esbuild-css-modules-plugin": "^3.1.5",
     "piral-cli": "1.8.5",
     "piral-cli-esbuild": "^1",
-    "typescript": "latest"
+    "typescript": "latest",
+    "typescript-plugin-css-modules": "^5.1.0"
   }
 }

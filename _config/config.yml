@@ -1,5 +1,6 @@
 ---
 Name: silverstripe-bifrost-admin
+After: silverstripe-forager
 ---
 SilverstripeSearch\Admin\SilverstripeSearchAdmin:
     pilets:
@@ -13,3 +14,7 @@ SilverstripeSearch\Admin\SilverstripeSearchAdmin:
           link: 'silverstripe/silverstripe-bifrost-admin:client/landing/dist/index.js'
           requireRef: System.import
           spec: v3
+
+SilverStripe\Forager\Admin\SearchAdmin:
+  menu_title: "Search Indexing"
+  menu_icon_class: font-icon-p-search

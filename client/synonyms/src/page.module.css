@@ -1,0 +1,15 @@
+.page {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.85rem;
+}
+
+.title hr {
+  margin-bottom: 0;
+}

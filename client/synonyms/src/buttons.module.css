@@ -1,0 +1,15 @@
+.iconButton {
+  background: none;
+  border: none;
+  line-height: 1rem;
+}
+
+.iconButton i {
+  font-size: 1.4rem;
+  vertical-align: middle;
+  color: var(--cms-icon-colour);
+}
+
+.deleteIcon i {
+  color: var(--red);
+}

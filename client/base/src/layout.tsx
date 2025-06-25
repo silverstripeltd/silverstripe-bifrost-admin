@@ -1,3 +1,4 @@
+import styles from "./layout.module.css";
 import * as React from "react";
 import { Link } from "react-router-dom";
 import {
@@ -10,7 +11,7 @@ import {
 } from "piral";
 
 const MenuItem: React.FC<MenuItemProps> = ({ children }) => (
-    <li className="nav-item">{children}</li>
+    <li>{children}</li>
 );
 
 export const errors: Partial<ErrorComponentsState> = {
@@ -44,40 +45,25 @@ export const layout: Partial<ComponentsState> = {
         <div className={`tile cols-${columns} rows-${rows}`}>{children}</div>
     ),
     Layout: ({ children }) => (
-        <div>
+        <div className="silverstripe-search-admin">
             <Notifications />
-            <Menu type="general" />
-            <div className="container">{children}</div>
+            <div className={styles.adminContainer}>
+                <div className={`${styles.header} ${styles.headerTitle} vertical-align-items`}>
+                    <span className={styles.title}>Silverstripe Search</span>
+                </div>
+                <div className={`${styles.header} ${styles.breadcrumbs}`}></div>
+                <div className={styles.sidebar}>
+                    <Menu type="general" />
+                </div>
+                <div className={styles.contentHeader}>{children}</div>
+            </div>
         </div>
     ),
     MenuContainer: ({ children }) => {
-        const [collapsed, setCollapsed] = React.useState(true);
         return (
-            <header>
-                <nav className="navbar navbar-light navbar-expand-sm navbar-toggleable-sm ng-white border-bottom box-shadow mb-3">
-                    <div className="container">
-                        <Link className="navbar-brand" to="/">
-                            Silverstripe Search 🔎
-                        </Link>
-                        <button
-                            aria-label="Toggle navigation"
-                            type="button"
-                            onClick={() => setCollapsed(!collapsed)}
-                            className="navbar-toggler mr-2"
-                        >
-                            <span className="navbar-toggler-icon" />
-                        </button>
-                        <div
-                            className={`collapse navbar-collapse d-sm-inline-flex flex-sm-row-reverse ${
-                                collapsed ? "" : "show"
-                            }`}
-                            aria-expanded={!collapsed}
-                        >
-                            <ul className="navbar-nav flex-grow">{children}</ul>
-                        </div>
-                    </div>
-                </nav>
-            </header>
+            <nav className={styles.nav} aria-label="Silverstripe Search administration">
+                <ul className={styles.navList}>{children}</ul>
+            </nav>
         );
     },
     MenuItem,

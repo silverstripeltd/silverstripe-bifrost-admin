@@ -1,33 +1,33 @@
 //@pilet v:2(esbuildpr_synonyms,{})
-System.register(["react", "silverstripe-search-admin"], function (_export, _context) {
+System.register(["react", "silverstripe-search-admin", "react-router-dom"], function (_export, _context) {
   "use strict";
 
-  var a, m, p, u, c;
-  async function r(e) {
+  var m, p, d, g, y, w, x, R, _, S, r, u, f;
+  async function a(e) {
     if (!e.ok) {
       let n = await e.text();
       switch (e.status) {
         case 401:
         case 403:
-          throw new p(e.status, "Action not allowed", n);
+          throw new d(e.status, "Action not allowed", n);
         default:
-          throw new m(e.status, "Error with API request", n);
+          throw new p(e.status, "Error with API request", n);
       }
     }
     try {
       return e.json();
     } catch (n) {
       let t = await e.text();
-      throw new u(400, n.message, t);
+      throw new g(400, n.message, t);
     }
   }
-  function y(e) {
+  function l(e) {
     return {
       async getSynonyms(n) {
         let t = new URL(`${e.apiBase}/synonyms`, window.location.origin);
         t.searchParams.set("engine", n);
         let o = await fetch(t);
-        return r(o);
+        return a(o);
       },
       async addSynonymRule(n, t) {
         let o = new URL(`${e.apiBase}/${n}/synonyms`, window.location.origin),
@@ -39,7 +39,7 @@ System.register(["react", "silverstripe-search-admin"], function (_export, _cont
             }
           }),
           s = await fetch(i);
-        return r(s);
+        return a(s);
       },
       async updateSynonymRule(n, t) {
         let o = new URL(`${e.apiBase}/${n}/synonyms/${t.id}`, window.location.origin),
@@ -51,7 +51,7 @@ System.register(["react", "silverstripe-search-admin"], function (_export, _cont
             }
           }),
           s = await fetch(i);
-        return r(s);
+        return a(s);
       },
       async deleteSynonymRule(n, t) {
         let o = new URL(`${e.apiBase}/${n}/synonyms/${t}`, window.location.origin),
@@ -62,30 +62,63 @@ System.register(["react", "silverstripe-search-admin"], function (_export, _cont
             }
           }),
           s = await fetch(i);
-        return r(s);
+        return a(s);
       }
     };
   }
-  function f(e) {
-    let n = y({
+  function z(e) {
+    let n = l({
       apiBase: e.meta.config.apiBase
     });
-    e.registerPage("/engine/:engineName/synonyms", t => a.createElement(c, {
+    e.registerPage("/engine/:engineName/synonyms", t => m.createElement(f, {
       api: n,
       ...t
-    }));
+    })), e.registerExtension("engine-menu-item", u, {
+      base: "/engine",
+      slug: "synonyms",
+      text: "Synonyms"
+    });
   }
-  _export("setup", f);
+  _export("setup", z);
   return {
     setters: [function (_react) {
-      a = _react;
+      m = _react;
+      y = _react.default;
     }, function (_silverstripeSearchAdmin) {
-      m = _silverstripeSearchAdmin.ApiError;
-      p = _silverstripeSearchAdmin.ForbiddenError;
-      u = _silverstripeSearchAdmin.JsonError;
+      p = _silverstripeSearchAdmin.ApiError;
+      d = _silverstripeSearchAdmin.ForbiddenError;
+      g = _silverstripeSearchAdmin.JsonError;
+    }, function (_reactRouterDom) {
+      w = _reactRouterDom.NavLink;
+      x = _reactRouterDom.useRouteMatch;
     }],
     execute: function () {
-      c = a.lazy(() => _context.import("./Page-5WKZONHS.js"));
+      R = "menuitem-module__expandContainer_Rln6eW__100", _ = "menuitem-module__selected_Rln6eW__100", S = "menuitem-module__title_Rln6eW__100", r = {
+        expandContainer: R,
+        selected: _,
+        title: S
+      };
+      u = _ref => {
+        let {
+          params: {
+            engine: e,
+            base: n,
+            slug: t,
+            text: o
+          }
+        } = _ref;
+        let i = [n, e, t].join("/"),
+          c = x(i)?.isExact ?? !1;
+        return y.createElement("li", {
+          className: `${c && r.selected} ${r.expandContainer}`
+        }, y.createElement(w, {
+          exact: !0,
+          to: i,
+          activeClassName: r.selected,
+          className: r.title
+        }, o));
+      };
+      f = m.lazy(() => _context.import("./Page-T2D3OENX.js"));
       (function () {
         var d = document;
         var __bundleUrl__ = function () {
@@ -97,7 +130,7 @@ System.register(["react", "silverstripe-search-admin"], function (_export, _cont
           }
           return "/";
         }();
-        ["index.css"].forEach(cf => {
+        ["index.css", "Page-XAZGDAQO.css"].forEach(cf => {
           ;
           var u = __bundleUrl__ + cf;
           var e = d.createElement("link");

@@ -10,16 +10,24 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/react-modal": "^3",
+    "esbuild": "^0.25.5",
+    "esbuild-css-modules-plugin": "^3.1.5",
     "formik": "^2.4.6",
     "piral-cli": "^1.8.5",
     "piral-cli-esbuild": "^1",
     "react": "18.3.1",
+    "react-dom": "18",
     "react-modal": "^3.16.3",
     "react-router": "5.3.4",
     "react-router-dom": "5.3.4",
     "silverstripe-search-admin": "../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz",
     "tslib": "2.8.1",
-    "typescript": "latest"
+    "typescript": "^5.8",
+    "typescript-plugin-css-modules": "^5.1.0"
+  },
+  "resolutions": {
+    "@types/react-modal/@types/react": "^18",
+    "@types/hoist-non-react-statics/@types/react": "^18"
   },
   "main": "dist/index.js",
   "files": [
@@ -35,6 +43,7 @@
     "start": "pilet debug",
     "build": "pilet build",
     "release": "pilet build --fresh",
+    "watch": "SS_ENV=dev && pilet build --watch true --minify false --public-url 'admin/silverstripesearch/'",
     "upgrade": "pilet upgrade",
     "postinstall": "pilet declaration"
   },
