@@ -26,7 +26,7 @@ System.register(["react", "silverstripe-search-admin", "react-router", "react-ro
         }
       },
       async getSchema(s) {
-        let n = `${i.apiBase}/schema?index=${s}`,
+        let n = `${i.apiBase}/schema?engine=${s}`,
           e = await fetch(n);
         if (!e.ok) {
           let o = await e.text();

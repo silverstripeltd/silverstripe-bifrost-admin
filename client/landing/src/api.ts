@@ -50,7 +50,7 @@ export function createCMSApi(config: CMSConfig): CMSApi {
             }
         },
         async getSchema(indexName: string): Promise<Array<Schema>> {
-            const endpoint = `${config.apiBase}/schema?index=${indexName}`;
+            const endpoint = `${config.apiBase}/schema?engine=${indexName}`;
             const response = await fetch(endpoint);
             if (!response.ok) {
                 const body = await response.text();
