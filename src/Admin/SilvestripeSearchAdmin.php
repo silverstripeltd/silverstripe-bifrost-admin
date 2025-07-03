@@ -36,7 +36,6 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     private static $extra_requirements_css = [
         'silverstripe/silverstripe-bifrost-admin:client/base/dist/release/style.css',
         'silverstripe/silverstripe-bifrost-admin:client/base/dist/release/main.css',
-        'silverstripe/silverstripe-bifrost-admin:client/base/dist/release/main.css',
     ];
 
     private static array $allowed_actions = [
