@@ -22,7 +22,15 @@ export default ({ api }: Props) => {
                                     subscription. Please check your module installation.`;
 
                 if (e instanceof ForbiddenError) {
-                    content = `You do not have permission to access this content. Please check your permissions and/or API key configuration`;
+                    switch (e.code) {
+                        case 401:
+                           content = `Your API key does not have permission to access the service.
+                                Please check that it is configured correctly.`;
+                            break;
+                        default:
+                            content = `You don't have permission to view this content.
+                               Please check that you have the appropriate CMS permissions set.`;
+                    }
                 }
 
                 setError(
