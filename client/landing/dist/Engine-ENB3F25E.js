@@ -1,10 +1,10 @@
 System.register(["./chunk-REUDOJLT.js", "react"], function (_export, _context) {
   "use strict";
 
-  var o, t, e, h, b;
+  var l, t, e, h, b;
   return {
     setters: [function (_chunkREUDOJLTJs) {
-      o = _chunkREUDOJLTJs.a;
+      l = _chunkREUDOJLTJs.a;
       t = _chunkREUDOJLTJs.b;
     }, function (_react) {
       e = _react;
@@ -12,7 +12,7 @@ System.register(["./chunk-REUDOJLT.js", "react"], function (_export, _context) {
     execute: function () {
       h = _ref => {
         let {
-          rows: s
+          rows: r
         } = _ref;
         return e.createElement("div", {
           className: t.container
@@ -20,32 +20,30 @@ System.register(["./chunk-REUDOJLT.js", "react"], function (_export, _context) {
           className: t.tableTitle
         }, "Engine schema"), e.createElement("table", {
           className: t.table
-        }, e.createElement("thead", {
-          className: t.thead
-        }, e.createElement("tr", null, e.createElement("th", {
+        }, e.createElement("thead", null, e.createElement("tr", null, e.createElement("th", {
           className: t.th
         }, "Field name"), e.createElement("th", {
           className: t.th
         }, "Field type"))), e.createElement("tbody", {
           className: t.tbody
-        }, s)));
+        }, r)));
       }, _export("default", b = _ref2 => {
         let {
-          match: s,
-          api: i
+          match: r,
+          api: m
         } = _ref2;
-        let r = s?.params?.engineName,
-          [l, n] = e.useState(null),
-          [c, m] = e.useState(null);
+        let s = r?.params?.engineName,
+          [o, n] = e.useState(null),
+          [c, i] = e.useState(null);
         e.useEffect(() => {
-          r && i.getSchema(r).then(a => {
-            n(a), m(null);
+          s && m.getSchema(s).then(a => {
+            n(a), i(null);
           }).catch(a => {
-            n(null), m("Error loading schema");
+            n(null), i("Error loading schema");
           });
-        }, [r]);
-        let d = Object.keys(l ?? {}).map(a => {
-          let p = l[a];
+        }, [s]);
+        let d = Object.keys(o ?? {}).map(a => {
+          let p = o[a];
           return e.createElement("tr", {
             key: a,
             className: t.tr
@@ -69,12 +67,14 @@ System.register(["./chunk-REUDOJLT.js", "react"], function (_export, _context) {
           }, "number"))));
         });
         return e.createElement("div", {
-          className: o.page
+          className: l.page
         }, e.createElement("h2", {
-          className: o.title
-        }, s.params.engineName, " ", e.createElement("hr", null)), c && e.createElement("div", {
+          className: l.title
+        }, r.params.engineName, " ", e.createElement("hr", null)), !s && e.createElement("div", {
           className: "danger"
-        }, c), r && l && e.createElement(h, {
+        }, "Could not find engine"), c && e.createElement("div", {
+          className: "danger"
+        }, c), s && o && e.createElement(h, {
           rows: d
         }));
       });

@@ -20,7 +20,7 @@ export const Menu = ({ api }: Props) => {
     const ulId = useId();
     const engineMenu = engines.map((engine) => {
         return (
-            <li key={engine.name} className={`${styles.item}`}>
+            <li key={engine.name}>
                 <MenuItem name={engine.name} />
             </li>
         );
@@ -71,7 +71,7 @@ export const Menu = ({ api }: Props) => {
                 id={ulId}
                 className={`${styles.list} ${styles.engineList} ${expanded ? styles.expanded : ""}`}
             >
-                {error && <p className="error">{error}</p>}
+                {error && <p className="alert alert-danger">{error}</p>}
                 {engineMenu}
             </ul>
         </div>

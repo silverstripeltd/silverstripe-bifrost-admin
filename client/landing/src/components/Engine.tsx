@@ -14,7 +14,7 @@ const Table = ({ rows }) => {
         <div className={tableStyles.container}>
             <h3 className={tableStyles.tableTitle}>Engine schema</h3>
             <table className={tableStyles.table}>
-                <thead className={tableStyles.thead}>
+                <thead>
                     <tr>
                         <th className={tableStyles.th}>Field name</th>
                         <th className={tableStyles.th}>Field type</th>
@@ -67,6 +67,7 @@ export default ({ match, api }: PageProps) => {
             <h2 className={styles.title}>
                 {match.params.engineName} <hr />
             </h2>
+            {!engineName && <div className="danger">Could not find engine</div>}
             {error && <div className="danger">{error}</div>}
             {engineName && schema && <Table rows={out} />}
         </div>

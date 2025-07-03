@@ -2,6 +2,7 @@
 
 namespace SilverstripeSearch\Admin;
 
+use Elastic\EnterpriseSearch\Exception\ClientErrorResponseException;
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\CMS\Controllers\CMSMain;
 use SilverStripe\Control\Director;
@@ -18,6 +19,7 @@ use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
 use SilverStripe\Security\Security;
 use stdClass;
+use Throwable;
 
 class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 {
@@ -135,14 +137,21 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         $indexService = Injector::inst()->get(IndexingInterface::class);
 
         $output = [];
-        foreach ($engines as $name => $configuration) {
-            $indexName = $indexService->environmentizeIndex($name);
-            $totalDocs = $indexService->getDocumentTotal($name);
-            $engine = new stdClass();
-            $engine->name = $indexName;
-            $engine->totalDocs = $totalDocs;
 
-            $output [] = $engine;
+        try {
+            foreach ($engines as $name => $configuration) {
+                $indexName = $indexService->environmentizeIndex($name);
+                $totalDocs = $indexService->getDocumentTotal($name);
+                $engine = new stdClass();
+                $engine->name = $indexName;
+                $engine->totalDocs = $totalDocs;
+
+                $output [] = $engine;
+            }
+        } catch (ClientErrorResponseException $e) {
+            return $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (Throwable $e) {
+            return $this->jsonError($e->getCode(), $e->getMessage());
         }
 
         return json_encode($output);
@@ -190,7 +199,13 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         $engine = $request->getVar('engine');
         $service = SynonymService::singleton();
 
-        $rules = $service->getSynonymRules($engine);
+        try {
+            $rules = $service->getSynonymRules($engine);
+        } catch (ClientErrorResponseException $e) {
+            return $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (Throwable $e) {
+            return $this->jsonError($e->getCode(), $e->getMessage());
+        }
 
         return json_encode($rules->toArray());
     }
@@ -228,7 +243,13 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             $rule->setRoot($root);
         }
 
-        $id = $service->createSynonymRule($engine, $rule);
+        try {
+            $id = $service->createSynonymRule($engine, $rule);
+        } catch (ClientErrorResponseException $e) {
+            return $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (Throwable $e) {
+            return $this->jsonError($e->getCode(), $e->getMessage());
+        }
 
         $outputRule = new SynonymRule($id);
         $outputRule->setType($type);
@@ -277,7 +298,13 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             $rule->setRoot($root);
         }
 
-        $service->updateSynonymRule($engine, $id, $rule);
+        try {
+            $service->updateSynonymRule($engine, $id, $rule);
+        } catch (ClientErrorResponseException $e) {
+            return $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (Throwable $e) {
+            return $this->jsonError($e->getCode(), $e->getMessage());
+        }
 
         $outputRule = new SynonymRule($id);
         $outputRule->setType($type);
@@ -302,7 +329,14 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         }
 
         $service = SynonymService::singleton();
-        $service->deleteSynonymRule($engine, $id);
+
+        try {
+            $service->deleteSynonymRule($engine, $id);
+        } catch (ClientErrorResponseException $e) {
+            return $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (Throwable $e) {
+            return $this->jsonError($e->getCode(), $e->getMessage());
+        }
 
         return json_encode([
             'status' => 'success'

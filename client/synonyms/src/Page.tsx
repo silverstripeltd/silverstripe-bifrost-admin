@@ -35,9 +35,19 @@ export default ({ api, match }: PageProps) => {
                 setLoading(false);
                 console.error(e);
                 if (e instanceof ForbiddenError) {
-                    setApiError(
-                        "You don't have permission to view this content"
-                    );
+                    switch (e.code) {
+                        case 401:
+                            setApiError(
+                                `Your plan does not include access to this feature.`
+                            );
+                            break;
+                        default:
+                            setApiError(
+                                `You don't have permission to view this content.
+                               Please check that you have the appropriate CMS permissions set.`
+                            );
+
+                    }
                 } else {
                     setApiError("Error fetching synonyms");
                 }

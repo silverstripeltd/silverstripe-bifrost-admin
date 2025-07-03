@@ -41,12 +41,12 @@ System.register(["./chunk-REUDOJLT.js", "react", "silverstripe-search-admin", "r
       }, "API specification")));
       u = _ref => {
         let {
-          engines: o
+          engines: t
         } = _ref;
-        let t = o.map(_ref2 => {
+        let l = t.map(_ref2 => {
           let {
             name: s,
-            totalDocs: l
+            totalDocs: o
           } = _ref2;
           return e.createElement("tr", {
             key: s,
@@ -57,7 +57,7 @@ System.register(["./chunk-REUDOJLT.js", "react", "silverstripe-search-admin", "r
             to: `engine/${s}`
           }, s)), e.createElement("td", {
             className: r.td
-          }, l), e.createElement("td", {
+          }, o), e.createElement("td", {
             className: r.td
           }, e.createElement(h, {
             to: `engine/${s}`
@@ -82,19 +82,19 @@ System.register(["./chunk-REUDOJLT.js", "react", "silverstripe-search-admin", "r
           className: r.th
         }, "Actions"))), e.createElement("tbody", {
           className: r.tbody
-        }, t)));
+        }, l)));
       };
       _export("default", $ = _ref3 => {
         let {
-          api: o
+          api: t
         } = _ref3;
-        let [t, s] = i.useState([]),
-          [l, b] = i.useState(null);
+        let [l, s] = i.useState([]),
+          [o, b] = i.useState(null);
         return i.useEffect(() => {
-          o.getEngines().then(s).catch(d => {
+          t.getEngines().then(s).catch(d => {
             console.error(d);
             let c = `Error fetching information about your search
-                                    subscription. Please check the module installation.`;
+                                    subscription. Please check your module installation.`;
             d instanceof v && (c = "You do not have permission to access this content. Please check your permissions and/or API key configuration"), b(i.createElement("div", {
               className: "engine"
             }, i.createElement("p", null, c)));
@@ -103,8 +103,10 @@ System.register(["./chunk-REUDOJLT.js", "react", "silverstripe-search-admin", "r
           className: m.page
         }, i.createElement("h2", {
           className: m.title
-        }, "Engines Overview ", i.createElement("hr", null)), i.createElement(p, null), l, i.createElement(u, {
-          engines: t
+        }, "Engines Overview ", i.createElement("hr", null)), i.createElement(p, null), o && i.createElement("div", {
+          className: "alert alert-danger"
+        }, o), i.createElement(u, {
+          engines: l
         }));
       });
     }

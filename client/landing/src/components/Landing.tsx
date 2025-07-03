@@ -19,7 +19,7 @@ export default ({ api }: Props) => {
             .catch((e) => {
                 console.error(e);
                 let content = `Error fetching information about your search
-                                    subscription. Please check the module installation.`;
+                                    subscription. Please check your module installation.`;
 
                 if (e instanceof ForbiddenError) {
                     content = `You do not have permission to access this content. Please check your permissions and/or API key configuration`;
@@ -36,7 +36,7 @@ export default ({ api }: Props) => {
         <div className={styles.page}>
             <h2 className={styles.title}>Engines Overview <hr/></h2>
             <SearchBanner/>
-            {error}
+            {error && <div className="alert alert-danger">{error}</div>}
             <EngineTable engines={engines} />
         </div>
     );
