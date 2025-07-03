@@ -10,14 +10,14 @@ use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Core\Manifest\ModuleResourceLoader;
 use SilverStripe\Forager\Interfaces\IndexingInterface;
-use SilverStripe\Forager\Service\IndexConfiguration;
 use SilverStripe\Forager\Service\Query\SynonymRule as QuerySynonymRule;
 use SilverStripe\Forager\Service\Results\SynonymRule;
 use SilverStripe\Forager\Service\SynonymService;
-use SilverStripe\ForagerElasticEnterprise\Service\EnterpriseSearchService;
+use SilverStripe\ForagerBifrost\Service\BifrostService;
+use SilverStripe\ForagerBifrost\Service\Requests\GetSchema;
+use SilverStripe\ForagerBifrost\Service\Requests\PostEngines;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
-use SilverStripe\Security\Security;
 use stdClass;
 use Throwable;
 
@@ -67,7 +67,6 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     public const SILVERSTRIPE_SEARCH_EDIT_SYNONYMS = 'SILVERSTRIPE_SEARCH_EDIT_SYNONYMS';
     public const SILVERSTRIPE_SEARCH_PERMISSION_ACCESS = 'CMS_ACCESS_SilverstripeSearchAdmin';
 
-
     public function providePermissions()
     {
         return [
@@ -96,7 +95,6 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 
     public function pilets(HTTPRequest $request)
     {
-
         $piletConfig = $this->config()->get('pilets');
         $apiBase = Director::absoluteURL($this->Link()) . '/api/v1';
 
@@ -130,21 +128,26 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             return $this->jsonError(403, "You do not have permission for this endpoint");
         }
 
-        $config = IndexConfiguration::singleton();
-        $engines = $config->getIndexes();
-
-        /** @var IndexingInterface $indexService */
-        $indexService = Injector::inst()->get(IndexingInterface::class);
-
-        $output = [];
-
         try {
-            foreach ($engines as $name => $configuration) {
-                $indexName = $indexService->environmentizeIndex($name);
-                $totalDocs = $indexService->getDocumentTotal($name);
+            /** @var BifrostService $indexService */
+            $indexService = Injector::inst()->get(IndexingInterface::class);
+            $request = new PostEngines();
+            $response = $indexService->getClient()->appSearch()->listEngines($request)->asArray();
+
+            $results = $response['results'] ?? null;
+
+            if (!$results) {
+                return $this->jsonError(403, "No engines are available to these credentials");
+            }
+
+            foreach ($results as $engineObject) {
                 $engine = new stdClass();
-                $engine->name = $indexName;
-                $engine->totalDocs = $totalDocs;
+                $engine->name = $engineObject['name'];
+
+                $engineSuffix = explode('-', $engine->name);
+                $engineSuffix = end($engineSuffix);
+
+                $engine->totalDocs = $indexService->getDocumentTotal($engineSuffix);
 
                 $output [] = $engine;
             }
@@ -164,29 +167,21 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         }
         $output = new stdClass();
 
-        $fullIndexName = $request->getVar('index');
+        $fullIndexName = $request->getVar('engine');
 
         if (!$fullIndexName) {
             return json_encode($output);
         }
-        $variant = IndexConfiguration::singleton()->getIndexVariant();
-        $prefix = sprintf('%s-', $variant);
-        $indexName = str_replace($prefix, '', $fullIndexName);
 
-        if (!array_key_exists($indexName, IndexConfiguration::singleton()->getIndexes())) {
-            return $this->jsonError(400, "Can't find index");
-        }
-
-        /** @var EnterpriseSearchService $indexService */
+        /** @var BifrostService $indexService */
         $indexService = Injector::inst()->get(IndexingInterface::class);
+        $request = new GetSchema($fullIndexName);
+        $response = $indexService->getClient()->appSearch()->getSchema($request)->asArray();
 
-        $fields = $indexService->getConfiguration()->getFieldsForIndex($indexName);
-
-        foreach ($fields as $field) {
-            $explicitFieldType = $field->getOption('type') ?? $indexService->config()->get('default_field_type');
-            $output->{$field->getSearchFieldName()} = $explicitFieldType;
+        foreach ($response as $fieldName => $fieldType) {
+            $output->{$fieldName} = $fieldType;
         }
-        // Fetch the Schema, as it is currently configured in our application
+
         return json_encode($output);
     }
 
@@ -223,7 +218,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         $type = $data->type ?? [];
         $root = $data->root ?? [];
 
-        if (empty($synonyms)) {
+        if (!$synonyms) {
             return $this->jsonError(422, 'synonyms cannot be empty');
         }
 
@@ -235,6 +230,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         $service = SynonymService::singleton();
         $rule = new QuerySynonymRule($type);
         $rule->setSynonyms($synonyms);
+
         if ($type === SynonymRule::TYPE_DIRECTIONAL) {
             if (empty($root)) {
                 return $this->jsonError(422, "Missing root for directional synonym");
@@ -255,7 +251,6 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         $outputRule->setType($type);
         $outputRule->setSynonyms($synonyms);
         $outputRule->setRoot($root);
-
 
         return json_encode($outputRule);
     }
@@ -290,6 +285,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         $service = SynonymService::singleton();
         $rule = new QuerySynonymRule($type);
         $rule->setSynonyms($synonyms);
+
         if ($type === SynonymRule::TYPE_DIRECTIONAL) {
             if (empty($root)) {
                 return $this->jsonError(422, "Missing root for directional synonym");
@@ -310,7 +306,6 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         $outputRule->setType($type);
         $outputRule->setSynonyms($synonyms);
         $outputRule->setRoot($root);
-
 
         return json_encode($outputRule);
     }
