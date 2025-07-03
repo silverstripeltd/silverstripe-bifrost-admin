@@ -1,11 +1,13 @@
 {
-    "name": "silverstripe/silverstripe-bifrost-admin",
-    "description": "Silverstripe Search Admin module",
+    "name": "silverstripeltd/silverstripe-bifrost-admin",
+    "description": "Silverstripe Search Administration module",
     "type": "silverstripe-vendormodule",
     "keywords": [
         "silverstripe",
         "search",
-        "CMS"
+        "CMS",
+        "elastic",
+        "service"
     ],
     "license": "BSD-3-Clause",
     "require": {
