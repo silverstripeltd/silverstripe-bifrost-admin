@@ -1,13 +1,4 @@
-<picture style="
-    background-color: #005ae0;
-    color: white;
-    border-radius: 8px;
-    flex-direction: column;
-    align-items: start;
-    gap: 1.6rem;
-    padding: 1.8rem;
-    display: flex;"
->
+<picture style="background-color: #005ae0; color: white; border-radius: 8px; flex-direction: column; align-items: start; gap: 1.6rem; padding: 1.8rem; display: flex;">
     <img src="./docs/images/logo.svg" alt="Silverstripe Search"/>
     <h1>Administration module</h1>
 </picture>
