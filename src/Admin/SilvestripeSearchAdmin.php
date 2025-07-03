@@ -165,6 +165,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         if ($this->viewCheck()) {
             return $this->jsonError(403, "You do not have permission for this endpoint");
         }
+
         $output = new stdClass();
 
         $fullIndexName = $request->getVar('engine');
@@ -173,13 +174,20 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             return json_encode($output);
         }
 
-        /** @var BifrostService $indexService */
-        $indexService = Injector::inst()->get(IndexingInterface::class);
-        $request = new GetSchema($fullIndexName);
-        $response = $indexService->getClient()->appSearch()->getSchema($request)->asArray();
+        try {
+            /** @var BifrostService $indexService */
+            $indexService = Injector::inst()->get(IndexingInterface::class);
+            $request = new GetSchema($fullIndexName);
+            $response = $indexService->getClient()->appSearch()->getSchema($request)->asArray();
+            ksort($response);
 
-        foreach ($response as $fieldName => $fieldType) {
-            $output->{$fieldName} = $fieldType;
+            foreach ($response as $fieldName => $fieldType) {
+                $output->{$fieldName} = $fieldType;
+            }
+        } catch (ClientErrorResponseException $e) {
+            return $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (Throwable $e) {
+            return $this->jsonError($e->getCode(), $e->getMessage());
         }
 
         return json_encode($output);
