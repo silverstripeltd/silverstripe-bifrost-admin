@@ -1,4 +1,4 @@
-<div style="
+<picture style="
     background-color: #005ae0;
     color: white;
     border-radius: 8px;
@@ -10,7 +10,7 @@
 >
     <img src="./docs/images/logo.svg" alt="Silverstripe Search"/>
     <h1>Administration module</h1>
-</div>
+</picture>
 
 The Silverstripe Search Administration module provides an interface for configuring your search settings from within the Silverstripe CMS.
 
