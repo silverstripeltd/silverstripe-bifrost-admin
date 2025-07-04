@@ -30,12 +30,12 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     private static $menu_icon_class  = "font-icon-search";
 
     private static $extra_requirements_javascript = [
-        'silverstripe/silverstripe-bifrost-admin:client/base/dist/release/main.js',
+        'silverstripeltd/silverstripe-bifrost-admin:client/base/dist/release/main.js',
     ];
 
     private static $extra_requirements_css = [
-        'silverstripe/silverstripe-bifrost-admin:client/base/dist/release/style.css',
-        'silverstripe/silverstripe-bifrost-admin:client/base/dist/release/main.css',
+        'silverstripeltd/silverstripe-bifrost-admin:client/base/dist/release/style.css',
+        'silverstripeltd/silverstripe-bifrost-admin:client/base/dist/release/main.css',
     ];
 
     private static array $allowed_actions = [

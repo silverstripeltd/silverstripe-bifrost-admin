@@ -34,7 +34,7 @@
 
 @media (min-width: 767px ) {
   .adminContainer {
-    grid-template-columns: minmax(0, 33cqw) 1fr;
+    grid-template-columns: minmax(min(30cqw, 100px), 350px) minmax(60cqw, 1fr);
     grid-template-rows: max-content;
   }
 }
