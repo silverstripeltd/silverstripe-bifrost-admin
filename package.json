@@ -3,7 +3,9 @@
   "engines": {
     "node": ">=18.x"
   },
-  "private": true,
+  "publishConfig": {
+    "workspaces": null
+  },
   "scripts": {
     "build": "yarn && yarn lint && yarn test && rm -rf client/dist/* && NODE_ENV=production webpack --mode production --bail --progress",
     "dev": "NODE_ENV=development webpack --progress",
