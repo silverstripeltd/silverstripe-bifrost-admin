@@ -98,15 +98,14 @@ System.register(["react", "silverstripe-search-admin", "react-router-dom"], func
         selected: _,
         title: S
       };
-      u = _ref => {
-        let {
-          params: {
-            engine: e,
-            base: n,
-            slug: t,
-            text: o
-          }
-        } = _ref;
+      u = ({
+        params: {
+          engine: e,
+          base: n,
+          slug: t,
+          text: o
+        }
+      }) => {
         let i = [n, e, t].join("/"),
           c = x(i)?.isExact ?? !1;
         return y.createElement("li", {
