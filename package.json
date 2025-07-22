@@ -3,27 +3,6 @@
   "engines": {
     "node": ">=18.x"
   },
-  "scripts": {
-    "build": "yarn && yarn lint && yarn test && rm -rf client/dist/* && NODE_ENV=production webpack --mode production --bail --progress",
-    "dev": "NODE_ENV=development webpack --progress",
-    "watch": "NODE_ENV=development webpack --watch --progress",
-    "css": "WEBPACK_CHILD=css npm run build",
-    "test": "jest",
-    "coverage": "jest --coverage",
-    "lint": "yarn lint-js && yarn lint-sass",
-    "lint-js": "eslint client/src",
-    "lint-js-fix": "eslint client/src --fix",
-    "lint-sass": "sass-lint client/src"
-  },
-  "dependencies": {
-    "core-js": "^3.26.0",
-    "piral-cli": "^1.8.5",
-    "piral-cli-esbuild": "^1.2.2",
-    "typescript": "^5.8"
-  },
-  "workspaces": [
-    "client/*"
-  ],
   "devDependencies": {
     "@babel/runtime": "^7.20.0",
     "@silverstripe/eslint-config": "^1.0.0",
@@ -39,14 +18,7 @@
       "client/src"
     ],
     "moduleDirectories": [
-      "client/src",
-      "node_modules",
-      "../admin/client/src",
-      "../admin/node_modules",
-      "../silverstripe/admin/client/src",
-      "../silverstripe/admin/node_modules",
-      "../../silverstripe/admin/client/src",
-      "../../silverstripe/admin/node_modules"
+      "node_modules"
     ],
     "testMatch": [
       "**/tests/**/*-test.js?(x)"
@@ -61,5 +33,5 @@
       "@babel/preset-react"
     ]
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "yarn@4.1.1+sha512.ec40d0639bb307441b945d9467139cbb88d14394baac760b52eca038b330d16542d66fef61574271534ace5a200518dabf3b53a85f1f9e4bfa37141b538a9590"
 }

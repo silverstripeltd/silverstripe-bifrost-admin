@@ -1,0 +1,38 @@
+{
+  "name": "silverstripe-bifrost-admin-microfrontend",
+  "engines": {
+    "node": ">=18.x"
+  },
+  "private": true,
+  "scripts": {
+    "lint": "yarn lint-js && yarn lint-sass",
+    "lint-js": "eslint client/*",
+    "lint-js-fix": "eslint client/* --fix",
+    "lint-sass": "sass-lint client/*"
+  },
+  "dependencies": {
+    "esbuild": "^0.25.8",
+    "piral-cli": "^1.8.5",
+    "piral-cli-esbuild": "^1.2.2",
+    "typescript": "^5.8"
+  },
+  "workspaces": [
+    "*"
+  ],
+  "devDependencies": {
+    "@babel/runtime": "^7.20.0",
+    "@silverstripe/eslint-config": "^1.0.0",
+    "eslint": "^8.0.0",
+    "eslint-plugin-react-hooks": "^4.3.0"
+  },
+  "browserslist": [
+    "defaults"
+  ],
+  "jest": {
+    "testEnvironment": "jsdom",
+    "roots": [
+      "client/src"
+    ]
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+}

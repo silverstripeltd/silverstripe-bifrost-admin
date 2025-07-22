@@ -51,11 +51,10 @@ System.register(["react", "react-modal", "formik", "silverstripe-search-admin"],
       A = "TYPE_EQUIVALENT", ne = l => {
         let m = {};
         return (l?.synonyms?.filter(u => u) ?? []).length < 2 && (m.synonyms = "At least one synonym pair required"), m;
-      }, re = l => _ref => {
-        let {
-          remove: m,
-          push: d
-        } = _ref;
+      }, re = l => ({
+        remove: m,
+        push: d
+      }) => {
         let u = l.synonyms.map((c, s) => r.createElement("div", {
           key: s,
           className: t.synonymRow
@@ -85,97 +84,88 @@ System.register(["react", "react-modal", "formik", "silverstripe-search-admin"],
           },
           className: "font-icon-plus"
         }), " ", "Add value"));
-      }, E = _ref2 => {
-        let {
-          onSubmit: l,
-          initialValues: m = {
-            type: A,
-            synonyms: ["", ""]
-          },
-          removeSynonym: d
-        } = _ref2;
+      }, E = ({
+        onSubmit: l,
+        initialValues: m = {
+          type: A,
+          synonyms: ["", ""]
+        },
+        removeSynonym: d
+      }) => {
         let [u, c] = Z(!1);
         return r.createElement(oe, {
           initialValues: m,
-          onSubmit: function (n) {
+          onSubmit: (n, ...o) => {
             let a = n?.synonyms?.filter(y => y) ?? [];
-            for (var _len = arguments.length, o = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-              o[_key - 1] = arguments[_key];
-            }
             return n.synonyms = a, l(n, ...o);
           },
           validate: ne,
           validateOnChange: !1,
           validateOnBlur: !1
-        }, _ref3 => {
-          let {
-            values: n,
-            isSubmitting: o,
-            errors: a
-          } = _ref3;
-          return r.createElement(ee, null, r.createElement("div", {
-            className: t.formBody
-          }, r.createElement(T, {
-            type: "hidden",
-            name: "type",
-            value: A
-          }), r.createElement(R, {
-            name: "type"
-          }), r.createElement("fieldset", {
-            className: t.fieldset
-          }, r.createElement("legend", {
-            className: "sr-only"
-          }, "Synonyms:"), r.createElement(te, {
-            name: "synonyms"
-          }, re(n)), a.synonyms && r.createElement("div", {
-            className: "alert alert-danger"
-          }, a.synonyms)), "id" in n ? r.createElement(T, {
-            type: "hidden",
-            name: "id",
-            value: n.id
-          }) : null), r.createElement("div", {
-            className: t.formFooter
-          }, r.createElement("button", {
-            type: "submit",
-            className: "btn btn-primary",
-            disabled: o
-          }, o ? "Adding.." : "Save"), "id" in n && d ? r.createElement("button", {
-            type: "button",
-            className: "btn btn-danger",
-            disabled: u,
-            onClick: () => {
-              c(!0), d(n.id).then(() => {
-                c(!1);
-              });
-            }
-          }, u ? "Deleting.." : "Delete") : null));
-        });
+        }, ({
+          values: n,
+          isSubmitting: o,
+          errors: a
+        }) => r.createElement(ee, null, r.createElement("div", {
+          className: t.formBody
+        }, r.createElement(T, {
+          type: "hidden",
+          name: "type",
+          value: A
+        }), r.createElement(R, {
+          name: "type"
+        }), r.createElement("fieldset", {
+          className: t.fieldset
+        }, r.createElement("legend", {
+          className: "sr-only"
+        }, "Synonyms:"), r.createElement(te, {
+          name: "synonyms"
+        }, re(n)), a.synonyms && r.createElement("div", {
+          className: "alert alert-danger"
+        }, a.synonyms)), "id" in n ? r.createElement(T, {
+          type: "hidden",
+          name: "id",
+          value: n.id
+        }) : null), r.createElement("div", {
+          className: t.formFooter
+        }, r.createElement("button", {
+          type: "submit",
+          className: "btn btn-primary",
+          disabled: o
+        }, o ? "Adding.." : "Save"), "id" in n && d ? r.createElement("button", {
+          type: "button",
+          className: "btn btn-danger",
+          disabled: u,
+          onClick: () => {
+            c(!0), d(n.id).then(() => {
+              c(!1);
+            });
+          }
+        }, u ? "Deleting.." : "Delete") : null)));
       };
-      X = _ref4 => {
-        let {
-          add: l,
-          onClose: m,
-          buttonClasses: d = "btn btn-primary",
-          text: u = f.createElement("span", {
-            className: "vertical-align-items"
-          }, f.createElement("i", {
-            style: {
-              lineHeight: "10px",
-              marginRight: "0.5rem",
-              fontSize: "1.2rem"
-            },
-            className: "font-icon-plus"
-          }), "Create a synonym set")
-        } = _ref4;
+      X = ({
+        add: l,
+        onClose: m,
+        buttonClasses: d = "btn btn-primary",
+        text: u = f.createElement("span", {
+          className: "vertical-align-items"
+        }, f.createElement("i", {
+          style: {
+            lineHeight: "10px",
+            marginRight: "0.5rem",
+            fontSize: "1.2rem"
+          },
+          className: "font-icon-plus"
+        }), "Create a synonym set")
+      }) => {
         let [c, s] = k(!1),
           [n, o] = k(""),
           a = () => {
             s(!1), o("");
           },
-          y = (S, _ref5) => {
-            let {
-              setSubmitting: b
-            } = _ref5;
+          y = (S, {
+            setSubmitting: b
+          }) => {
             let N = S.type,
               C = S.synonyms,
               i = {
@@ -215,22 +205,20 @@ System.register(["react", "react-modal", "formik", "silverstripe-search-admin"],
           onSubmit: y
         })));
       };
-      B = _ref6 => {
-        let {
-          update: l,
-          onClose: m,
-          initialValues: d,
-          remove: u
-        } = _ref6;
+      B = ({
+        update: l,
+        onClose: m,
+        initialValues: d,
+        remove: u
+      }) => {
         let [c, s] = I(!1),
           [n, o] = I(""),
           a = () => {
             s(!1), o("");
           },
-          y = (b, _ref7) => {
-            let {
-              setSubmitting: N
-            } = _ref7;
+          y = (b, {
+            setSubmitting: N
+          }) => {
             let C = b.id,
               i = b.type,
               p = b.synonyms,
@@ -282,12 +270,11 @@ System.register(["react", "react-modal", "formik", "silverstripe-search-admin"],
           removeSynonym: F
         })));
       };
-      M = _ref8 => {
-        let {
-          remove: l,
-          id: m,
-          onClose: d
-        } = _ref8;
+      M = ({
+        remove: l,
+        id: m,
+        onClose: d
+      }) => {
         let [u, c] = J(!1),
           [s, n] = J(""),
           o = () => {
@@ -364,11 +351,10 @@ System.register(["react", "react-modal", "formik", "silverstripe-search-admin"],
         tableContainer: Xe,
         title: we
       };
-      _export("default", Mo = _ref9 => {
-        let {
-          api: l,
-          match: m
-        } = _ref9;
+      _export("default", Mo = ({
+        api: l,
+        match: m
+      }) => {
         let [d, u] = V([]),
           [c, s] = V(!1),
           [n, o] = V(""),

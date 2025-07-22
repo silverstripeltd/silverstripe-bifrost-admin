@@ -9,6 +9,7 @@
     "@types/node": "latest",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "esbuild": "^0.25.8",
     "esbuild-css-modules-plugin": "^3.1.5",
     "piral-cli-esbuild": "^1",
     "react": "18.3.1",
