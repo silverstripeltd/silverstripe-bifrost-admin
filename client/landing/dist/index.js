@@ -129,10 +129,9 @@ System.register(["react", "silverstripe-search-admin", "react-router", "react-ro
         selected: N,
         title: S
       };
-      b = _ref => {
-        let {
-          name: i
-        } = _ref;
+      b = ({
+        name: i
+      }) => {
         let s = P(p),
           n = $(),
           e = z(`/engine/${i}`),
@@ -164,10 +163,9 @@ System.register(["react", "silverstripe-search-admin", "react-router", "react-ro
           }
         })));
       };
-      v = _ref2 => {
-        let {
-          api: i
-        } = _ref2;
+      v = ({
+        api: i
+      }) => {
         let [s, n] = h(i),
           e = Y("/"),
           o = e?.isExact ?? !1,

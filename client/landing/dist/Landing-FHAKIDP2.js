@@ -39,33 +39,29 @@ System.register(["./chunk-REUDOJLT.js", "react", "silverstripe-search-admin", "r
         target: "_blank",
         href: "https://9595b293cf40d7532796c4ca67a27b81-bifrost.silverstripe.io/api/v1/docs"
       }, "API specification")));
-      u = _ref => {
-        let {
-          engines: o
-        } = _ref;
-        let l = o.map(_ref2 => {
-          let {
-            name: n,
-            totalDocs: t
-          } = _ref2;
-          return e.createElement("tr", {
-            key: n,
-            className: r.tr
-          }, e.createElement("td", {
-            className: r.td
-          }, e.createElement(p, {
-            to: `engine/${n}`
-          }, n)), e.createElement("td", {
-            className: r.td
-          }, t), e.createElement("td", {
-            className: r.td
-          }, e.createElement(p, {
-            to: `engine/${n}`
-          }, e.createElement("i", {
-            className: "font-icon-edit",
-            "aria-label": "Edit"
-          }))));
-        });
+      u = ({
+        engines: o
+      }) => {
+        let l = o.map(({
+          name: n,
+          totalDocs: t
+        }) => e.createElement("tr", {
+          key: n,
+          className: r.tr
+        }, e.createElement("td", {
+          className: r.td
+        }, e.createElement(p, {
+          to: `engine/${n}`
+        }, n)), e.createElement("td", {
+          className: r.td
+        }, t), e.createElement("td", {
+          className: r.td
+        }, e.createElement(p, {
+          to: `engine/${n}`
+        }, e.createElement("i", {
+          className: "font-icon-edit",
+          "aria-label": "Edit"
+        })))));
         return e.createElement("div", {
           className: r.container
         }, e.createElement("h3", {
@@ -84,10 +80,9 @@ System.register(["./chunk-REUDOJLT.js", "react", "silverstripe-search-admin", "r
           className: r.tbody
         }, l)));
       };
-      _export("default", Y = _ref3 => {
-        let {
-          api: o
-        } = _ref3;
+      _export("default", Y = ({
+        api: o
+      }) => {
         let [l, n] = i.useState([]),
           [t, b] = i.useState(null);
         return i.useEffect(() => {
