@@ -17,6 +17,14 @@ use SilverStripe\ForagerBifrost\Service\BifrostService;
 use Silverstripe\Search\Client\Exception\EnginesPostNotFoundException;
 use Silverstripe\Search\Client\Exception\SchemaGetNotFoundException;
 use Silverstripe\Search\Client\Exception\SchemaGetUnprocessableEntityException;
+use Silverstripe\Search\Client\Exception\SynonymRuleDeleteNotFoundException;
+use Silverstripe\Search\Client\Exception\SynonymRuleDeleteUnprocessableEntityException;
+use Silverstripe\Search\Client\Exception\SynonymRulePostNotFoundException;
+use Silverstripe\Search\Client\Exception\SynonymRulePostUnprocessableEntityException;
+use Silverstripe\Search\Client\Exception\SynonymRulePutNotFoundException;
+use Silverstripe\Search\Client\Exception\SynonymRulePutUnprocessableEntityException;
+use Silverstripe\Search\Client\Exception\SynonymRulesGetNotFoundException;
+use Silverstripe\Search\Client\Exception\SynonymRulesGetUnprocessableEntityException;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
 use stdClass;
@@ -26,9 +34,9 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 {
     private static string $url_segment = "silverstripesearch";
 
-    private static string $menu_title  = "Silverstripe Search";
+    private static string $menu_title = "Silverstripe Search";
 
-    private static string $menu_icon_class  = "font-icon-search";
+    private static string $menu_icon_class = "font-icon-search";
 
     private static array $extra_requirements_javascript = [
         'silverstripeltd/silverstripe-bifrost-admin:client/base/dist/release/main.js',
@@ -189,6 +197,8 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             foreach ($response as $fieldName => $fieldType) {
                 $output->{$fieldName} = $fieldType;
             }
+
+            return json_encode($output);
         } catch (SchemaGetUnprocessableEntityException $e) {
             $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (SchemaGetNotFoundException $e) {
@@ -196,8 +206,6 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         } catch (Throwable $e) {
             $this->jsonError($e->getCode(), $e->getMessage());
         }
-
-        return json_encode($output);
     }
 
     /**
@@ -209,29 +217,36 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             $this->jsonError(403, "You do not have permission for this endpoint");
         }
 
-        $engine = $request->getVar('engine');
-        $engineSuffix = explode('/', $engine);
-        $engineSuffix = end($engineSuffix);
+        $engineFullName = $request->getVar('engine');
+        $engineSplit = explode('-', $engineFullName);
+        $engineSuffix = end($engineSplit);
         $service = SynonymService::singleton();
 
         try {
-            $rules = $service->getSynonymRules($engine);
-        } catch (ClientErrorResponseException $e) {
+            $response = $service->getSynonymRules($engineSuffix);
+
+            return json_encode($response->toArray());
+        } catch (SynonymRulesGetUnprocessableEntityException $e) {
+            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (SynonymRulesGetNotFoundException $e) {
             $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
             $this->jsonError($e->getCode(), $e->getMessage());
         }
-
-        return json_encode($rules->toArray());
     }
 
+    /**
+     * @throws HTTPResponse_Exception
+     */
     public function createSynonymRule(HTTPRequest $request): string
     {
         if ($this->editCheck()) {
             $this->jsonError(403, "You do not have permission for this endpoint");
         }
 
-        $engine = $request->param('Engine');
+        $engineFullName = $request->param('Engine');
+        $engineSplit = explode('-', $engineFullName);
+        $engineSuffix = end($engineSplit);
         $data = json_decode($request->getBody());
 
         $synonyms = $data->synonyms ?? [];
@@ -261,19 +276,21 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         }
 
         try {
-            $id = $service->createSynonymRule($engine, $rule);
-        } catch (ClientErrorResponseException $e) {
+            $id = $service->createSynonymRule($engineSuffix, $rule);
+
+            $outputRule = new SynonymRule($id);
+            $outputRule->setType($type);
+            $outputRule->setSynonyms($synonyms);
+            $outputRule->setRoot($root);
+
+            return json_encode($outputRule);
+        } catch (SynonymRulePostUnprocessableEntityException $e) {
+            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (SynonymRulePostNotFoundException $e) {
             $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
             $this->jsonError($e->getCode(), $e->getMessage());
         }
-
-        $outputRule = new SynonymRule($id);
-        $outputRule->setType($type);
-        $outputRule->setSynonyms($synonyms);
-        $outputRule->setRoot($root);
-
-        return json_encode($outputRule);
     }
 
     public function updateSynonymRule(HTTPRequest $request): string
@@ -282,7 +299,9 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             $this->jsonError(403, "You do not have permission for this endpoint");
         }
 
-        $engine = $request->param('Engine');
+        $engineFullName = $request->param('Engine');
+        $engineSplit = explode('-', $engineFullName);
+        $engineSuffix = end($engineSplit);
         $id = $request->param('ID');
         $data = json_decode($request->getBody());
 
@@ -317,28 +336,37 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         }
 
         try {
-            $service->updateSynonymRule($engine, $id, $rule);
-        } catch (ClientErrorResponseException $e) {
+            $service->updateSynonymRule($engineSuffix, $id, $rule);
+
+            $outputRule = new SynonymRule($id);
+            $outputRule->setType($type);
+            $outputRule->setSynonyms($synonyms);
+            $outputRule->setRoot($root);
+
+            return json_encode($outputRule);
+        } catch (SynonymRulePutNotFoundException $e) {
+            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (SynonymRulePutUnprocessableEntityException $e) {
             $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
             $this->jsonError($e->getCode(), $e->getMessage());
         }
-
-        $outputRule = new SynonymRule($id);
-        $outputRule->setType($type);
-        $outputRule->setSynonyms($synonyms);
-        $outputRule->setRoot($root);
-
-        return json_encode($outputRule);
     }
 
+    /**
+     * @param HTTPRequest $request
+     * @return string
+     * @throws HTTPResponse_Exception
+     */
     public function deleteSynonymRule(HTTPRequest $request): string
     {
         if ($this->editCheck()) {
             $this->jsonError(403, "You do not have permission for this endpoint");
         }
 
-        $engine = $request->param('Engine');
+        $engineFullName = $request->param('Engine');
+        $engineSplit = explode('-', $engineFullName);
+        $engineSuffix = end($engineSplit);
         $id = $request->param('ID');
 
         if (!$id) {
@@ -348,16 +376,18 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         $service = SynonymService::singleton();
 
         try {
-            $service->deleteSynonymRule($engine, $id);
-        } catch (ClientErrorResponseException $e) {
+            $service->deleteSynonymRule($engineSuffix, $id);
+
+            return json_encode([
+                'status' => 'success',
+            ]);
+        } catch (SynonymRuleDeleteNotFoundException $e) {
+            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (SynonymRuleDeleteUnprocessableEntityException $e) {
             $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
             $this->jsonError($e->getCode(), $e->getMessage());
         }
-
-        return json_encode([
-            'status' => 'success',
-        ]);
     }
 
     private function viewCheck(): bool
