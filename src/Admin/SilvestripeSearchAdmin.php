@@ -2,11 +2,11 @@
 
 namespace SilverstripeSearch\Admin;
 
-use Elastic\EnterpriseSearch\Exception\ClientErrorResponseException;
 use SilverStripe\Admin\LeftAndMain;
 use SilverStripe\CMS\Controllers\CMSMain;
 use SilverStripe\Control\Director;
 use SilverStripe\Control\HTTPRequest;
+use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Core\Manifest\ModuleResourceLoader;
 use SilverStripe\Forager\Interfaces\IndexingInterface;
@@ -14,8 +14,9 @@ use SilverStripe\Forager\Service\Query\SynonymRule as QuerySynonymRule;
 use SilverStripe\Forager\Service\Results\SynonymRule;
 use SilverStripe\Forager\Service\SynonymService;
 use SilverStripe\ForagerBifrost\Service\BifrostService;
-use SilverStripe\ForagerBifrost\Service\Requests\GetSchema;
-use SilverStripe\ForagerBifrost\Service\Requests\PostEngines;
+use Silverstripe\Search\Client\Exception\EnginesPostNotFoundException;
+use Silverstripe\Search\Client\Exception\SchemaGetNotFoundException;
+use Silverstripe\Search\Client\Exception\SchemaGetUnprocessableEntityException;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
 use stdClass;
@@ -23,17 +24,17 @@ use Throwable;
 
 class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 {
-    private static $url_segment = "silverstripesearch";
+    private static string $url_segment = "silverstripesearch";
 
-    private static $menu_title  = "Silverstripe Search";
+    private static string $menu_title  = "Silverstripe Search";
 
-    private static $menu_icon_class  = "font-icon-search";
+    private static string $menu_icon_class  = "font-icon-search";
 
-    private static $extra_requirements_javascript = [
+    private static array $extra_requirements_javascript = [
         'silverstripeltd/silverstripe-bifrost-admin:client/base/dist/release/main.js',
     ];
 
-    private static $extra_requirements_css = [
+    private static array $extra_requirements_css = [
         'silverstripeltd/silverstripe-bifrost-admin:client/base/dist/release/style.css',
         'silverstripeltd/silverstripe-bifrost-admin:client/base/dist/release/main.css',
     ];
@@ -48,7 +49,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         'getSchema',
     ];
 
-    private static $url_handlers = [
+    private static array $url_handlers = [
         'GET api/v1/pilets' => 'pilets',
         'GET api/v1/engines' => 'engines',
         'GET api/v1/synonyms' => 'getSynonyms',
@@ -62,9 +63,9 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 
     private static string $required_permission_codes = SilverstripeSearchAdmin::SILVERSTRIPE_SEARCH_PERMISSION_ACCESS;
 
-    public const SILVERSTRIPE_SEARCH_VIEW_SYNONYMS = 'SILVERSTRIPE_SEARCH_VIEW_SYNONYMS';
-    public const SILVERSTRIPE_SEARCH_EDIT_SYNONYMS = 'SILVERSTRIPE_SEARCH_EDIT_SYNONYMS';
-    public const SILVERSTRIPE_SEARCH_PERMISSION_ACCESS = 'CMS_ACCESS_SilverstripeSearchAdmin';
+    public const string SILVERSTRIPE_SEARCH_VIEW_SYNONYMS = 'SILVERSTRIPE_SEARCH_VIEW_SYNONYMS';
+    public const string SILVERSTRIPE_SEARCH_EDIT_SYNONYMS = 'SILVERSTRIPE_SEARCH_EDIT_SYNONYMS';
+    public const string SILVERSTRIPE_SEARCH_PERMISSION_ACCESS = 'CMS_ACCESS_SilverstripeSearchAdmin';
 
     public function providePermissions()
     {
@@ -121,48 +122,55 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         return json_encode($response);
     }
 
+    /**
+     * @throws HTTPResponse_Exception
+     */
     public function engines(HTTPRequest $request): string
     {
         if ($this->viewCheck()) {
-            return $this->jsonError(403, "You do not have permission for this endpoint");
+            $this->jsonError(403, "You do not have permission for this endpoint");
         }
 
         try {
             /** @var BifrostService $indexService */
             $indexService = Injector::inst()->get(IndexingInterface::class);
-            $request = new PostEngines();
-            $response = $indexService->getClient()->appSearch()->listEngines($request)->asArray();
+            $response = $indexService->getClient()->enginesPost();
 
-            $results = $response['results'] ?? null;
+            $results = $response->getResults() ?? null;
 
             if (!$results) {
-                return $this->jsonError(403, "No engines are available to these credentials");
+                $this->jsonError(403, "No engines are available to these credentials");
             }
+
+            $output = [];
 
             foreach ($results as $engineObject) {
                 $engine = new stdClass();
-                $engine->name = $engineObject['name'];
+                $engine->name = $engineObject->getName();
 
                 $engineSuffix = explode('-', $engine->name);
                 $engineSuffix = end($engineSuffix);
 
                 $engine->totalDocs = $indexService->getDocumentTotal($engineSuffix);
 
-                $output [] = $engine;
+                $output[] = $engine;
             }
-        } catch (ClientErrorResponseException $e) {
-            return $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
-        } catch (Throwable $e) {
-            return $this->jsonError($e->getCode(), $e->getMessage());
-        }
 
-        return json_encode($output);
+            return json_encode($output);
+        } catch (EnginesPostNotFoundException $e) {
+            $this->jsonError($e->getResponse()->getStatusCode(), (string) $e->getResponse()->getBody());
+        } catch (Throwable $e) {
+            $this->jsonError($e->getCode(), $e->getMessage());
+        }
     }
 
+    /**
+     * @throws HTTPResponse_Exception
+     */
     public function getSchema(HTTPRequest $request): string
     {
         if ($this->viewCheck()) {
-            return $this->jsonError(403, "You do not have permission for this endpoint");
+            $this->jsonError(403, "You do not have permission for this endpoint");
         }
 
         $output = new stdClass();
@@ -176,37 +184,42 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         try {
             /** @var BifrostService $indexService */
             $indexService = Injector::inst()->get(IndexingInterface::class);
-            $request = new GetSchema($fullIndexName);
-            $response = $indexService->getClient()->appSearch()->getSchema($request)->asArray();
-            ksort($response);
+            $response = $indexService->getClient()->schemaGet($fullIndexName);
 
             foreach ($response as $fieldName => $fieldType) {
                 $output->{$fieldName} = $fieldType;
             }
-        } catch (ClientErrorResponseException $e) {
-            return $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (SchemaGetUnprocessableEntityException $e) {
+            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (SchemaGetNotFoundException $e) {
+            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
-            return $this->jsonError($e->getCode(), $e->getMessage());
+            $this->jsonError($e->getCode(), $e->getMessage());
         }
 
         return json_encode($output);
     }
 
+    /**
+     * @throws HTTPResponse_Exception
+     */
     public function getSynonyms(HTTPRequest $request): string
     {
         if ($this->viewCheck()) {
-            return $this->jsonError(403, "You do not have permission for this endpoint");
+            $this->jsonError(403, "You do not have permission for this endpoint");
         }
 
         $engine = $request->getVar('engine');
+        $engineSuffix = explode('/', $engine);
+        $engineSuffix = end($engineSuffix);
         $service = SynonymService::singleton();
 
         try {
             $rules = $service->getSynonymRules($engine);
         } catch (ClientErrorResponseException $e) {
-            return $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
-            return $this->jsonError($e->getCode(), $e->getMessage());
+            $this->jsonError($e->getCode(), $e->getMessage());
         }
 
         return json_encode($rules->toArray());
@@ -215,7 +228,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     public function createSynonymRule(HTTPRequest $request): string
     {
         if ($this->editCheck()) {
-            return $this->jsonError(403, "You do not have permission for this endpoint");
+            $this->jsonError(403, "You do not have permission for this endpoint");
         }
 
         $engine = $request->param('Engine');
@@ -226,12 +239,13 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         $root = $data->root ?? [];
 
         if (!$synonyms) {
-            return $this->jsonError(422, 'synonyms cannot be empty');
+            $this->jsonError(422, 'synonyms cannot be empty');
         }
 
         if (!in_array($type, [SynonymRule::TYPE_EQUIVALENT, SynonymRule::TYPE_DIRECTIONAL])) {
             $error = 'type must be one of "TYPE_EQUIVALENT" or "TYPE_DIRECTIONAL"';
-            return $this->jsonError(422, $error);
+
+            $this->jsonError(422, $error);
         }
 
         $service = SynonymService::singleton();
@@ -240,7 +254,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 
         if ($type === SynonymRule::TYPE_DIRECTIONAL) {
             if (empty($root)) {
-                return $this->jsonError(422, "Missing root for directional synonym");
+                $this->jsonError(422, "Missing root for directional synonym");
             }
 
             $rule->setRoot($root);
@@ -249,9 +263,9 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         try {
             $id = $service->createSynonymRule($engine, $rule);
         } catch (ClientErrorResponseException $e) {
-            return $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
-            return $this->jsonError($e->getCode(), $e->getMessage());
+            $this->jsonError($e->getCode(), $e->getMessage());
         }
 
         $outputRule = new SynonymRule($id);
@@ -265,7 +279,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     public function updateSynonymRule(HTTPRequest $request): string
     {
         if ($this->editCheck()) {
-            return $this->jsonError(403, "You do not have permission for this endpoint");
+            $this->jsonError(403, "You do not have permission for this endpoint");
         }
 
         $engine = $request->param('Engine');
@@ -277,16 +291,17 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         $root = $data->root ?? [];
 
         if (!$id) {
-            return $this->jsonError(422, 'Must provide an ID');
+            $this->jsonError(422, 'Must provide an ID');
         }
 
         if (empty($synonyms)) {
-            return $this->jsonError(422, 'synonyms cannot be empty');
+            $this->jsonError(422, 'synonyms cannot be empty');
         }
 
         if (!in_array($type, [SynonymRule::TYPE_EQUIVALENT, SynonymRule::TYPE_DIRECTIONAL])) {
             $error = 'type must be one of "TYPE_EQUIVALENT" or "TYPE_DIRECTIONAL"';
-            return $this->jsonError(422, $error);
+
+            $this->jsonError(422, $error);
         }
 
         $service = SynonymService::singleton();
@@ -295,7 +310,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 
         if ($type === SynonymRule::TYPE_DIRECTIONAL) {
             if (empty($root)) {
-                return $this->jsonError(422, "Missing root for directional synonym");
+                $this->jsonError(422, "Missing root for directional synonym");
             }
 
             $rule->setRoot($root);
@@ -304,9 +319,9 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         try {
             $service->updateSynonymRule($engine, $id, $rule);
         } catch (ClientErrorResponseException $e) {
-            return $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
-            return $this->jsonError($e->getCode(), $e->getMessage());
+            $this->jsonError($e->getCode(), $e->getMessage());
         }
 
         $outputRule = new SynonymRule($id);
@@ -320,14 +335,14 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     public function deleteSynonymRule(HTTPRequest $request): string
     {
         if ($this->editCheck()) {
-            return $this->jsonError(403, "You do not have permission for this endpoint");
+            $this->jsonError(403, "You do not have permission for this endpoint");
         }
 
         $engine = $request->param('Engine');
         $id = $request->param('ID');
 
         if (!$id) {
-            return $this->jsonError(400, 'Missing ID');
+            $this->jsonError(400, 'Missing ID');
         }
 
         $service = SynonymService::singleton();
@@ -335,13 +350,13 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         try {
             $service->deleteSynonymRule($engine, $id);
         } catch (ClientErrorResponseException $e) {
-            return $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
-            return $this->jsonError($e->getCode(), $e->getMessage());
+            $this->jsonError($e->getCode(), $e->getMessage());
         }
 
         return json_encode([
-            'status' => 'success'
+            'status' => 'success',
         ]);
     }
 
