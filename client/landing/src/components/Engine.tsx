@@ -67,8 +67,8 @@ export default ({ match, api }: PageProps) => {
             <h2 className={styles.title}>
                 {match.params.engineName} <hr />
             </h2>
-            {!engineName && <div className="danger">Could not find engine</div>}
-            {error && <div className="danger">{error}</div>}
+            {!engineName && <div className="alert alert-danger">Could not find engine</div>}
+            {error && <div className="alert alert-danger">{error}</div>}
             {engineName && schema && <Table rows={out} />}
         </div>
     );
