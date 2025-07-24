@@ -1,6 +1,7 @@
 :global(.silverstripe-search-admin) {
   container-type: size;
   height: 100%;
+
   --padding: 1.53856rem;
   --cms-header-colour: #fafbfc;
   --cms-border-colour: #ced5e1;
@@ -8,6 +9,7 @@
   --menu-selected: #d8e4eb;
   --black: hsla(216, 6%, 17%, 1);
   --blue-primary: hsla(216, 100%, 44%, 1);
+  --white: #fff;
 }
 
 /* pass variables to modals */
