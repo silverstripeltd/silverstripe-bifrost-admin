@@ -40,7 +40,8 @@
             "dealerdirect/phpcodesniffer-composer-installer": true,
             "silverstripe/recipe-plugin": true,
             "silverstripe/vendor-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
         }
     }
 }
