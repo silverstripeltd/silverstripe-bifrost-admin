@@ -21,6 +21,7 @@
   --menu-selected: #d8e4eb;
   --black: hsla(216, 6%, 17%, 1);
   --blue-primary: hsla(216, 100%, 44%, 1);
+  --white: #fff;
 }
 
 .adminContainer {
