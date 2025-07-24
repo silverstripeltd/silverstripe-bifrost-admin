@@ -1,10 +1,10 @@
 System.register(["./chunk-REUDOJLT.js", "react"], function (_export, _context) {
   "use strict";
 
-  var l, t, e, h, b;
+  var o, t, e, h, b;
   return {
     setters: [function (_chunkREUDOJLTJs) {
-      l = _chunkREUDOJLTJs.a;
+      o = _chunkREUDOJLTJs.a;
       t = _chunkREUDOJLTJs.b;
     }, function (_react) {
       e = _react;
@@ -29,7 +29,7 @@ System.register(["./chunk-REUDOJLT.js", "react"], function (_export, _context) {
         api: m
       }) => {
         let s = r?.params?.engineName,
-          [o, n] = e.useState(null),
+          [l, n] = e.useState(null),
           [c, i] = e.useState(null);
         e.useEffect(() => {
           s && m.getSchema(s).then(a => {
@@ -38,8 +38,8 @@ System.register(["./chunk-REUDOJLT.js", "react"], function (_export, _context) {
             n(null), i("Error loading schema");
           });
         }, [s]);
-        let d = Object.keys(o ?? {}).map(a => {
-          let p = o[a];
+        let d = Object.keys(l ?? {}).map(a => {
+          let p = l[a];
           return e.createElement("tr", {
             key: a,
             className: t.tr
@@ -63,14 +63,14 @@ System.register(["./chunk-REUDOJLT.js", "react"], function (_export, _context) {
           }, "number"))));
         });
         return e.createElement("div", {
-          className: l.page
+          className: o.page
         }, e.createElement("h2", {
-          className: l.title
+          className: o.title
         }, r.params.engineName, " ", e.createElement("hr", null)), !s && e.createElement("div", {
-          className: "danger"
+          className: "alert alert-danger"
         }, "Could not find engine"), c && e.createElement("div", {
-          className: "danger"
-        }, c), s && o && e.createElement(h, {
+          className: "alert alert-danger"
+        }, c), s && l && e.createElement(h, {
           rows: d
         }));
       });
