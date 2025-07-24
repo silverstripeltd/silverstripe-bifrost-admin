@@ -32,9 +32,9 @@ use Throwable;
 
 class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 {
-    private static string $url_segment = "silverstripesearch";
+    private static string $url_segment = 'silverstripesearch';
 
-    private static string $menu_title = "Silverstripe Search";
+    private static string $menu_title = 'Silverstripe Search';
 
     private static string $menu_icon_class = "font-icon-search";
 
@@ -75,7 +75,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     public const string SILVERSTRIPE_SEARCH_EDIT_SYNONYMS = 'SILVERSTRIPE_SEARCH_EDIT_SYNONYMS';
     public const string SILVERSTRIPE_SEARCH_PERMISSION_ACCESS = 'CMS_ACCESS_SilverstripeSearchAdmin';
 
-    public function providePermissions()
+    public function providePermissions(): array
     {
         return [
             SilverstripeSearchAdmin::SILVERSTRIPE_SEARCH_VIEW_SYNONYMS => [
@@ -101,12 +101,12 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         ];
     }
 
-    public function pilets(HTTPRequest $request)
+    public function pilets(HTTPRequest $request): string
     {
         $piletConfig = $this->config()->get('pilets');
         $apiBase = Director::absoluteURL($this->Link()) . '/api/v1';
 
-        $piletConfig = array_map(function ($pilet) use ($apiBase) {
+        $piletConfig = array_map(static function ($pilet) use ($apiBase) {
             if (array_key_exists('link', $pilet)) {
                 // resolve any silverstripe location references
                 $pilet['link'] = ModuleResourceLoader::singleton()->resolveURL($pilet['link']);
@@ -137,7 +137,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     {
         try {
             if ($this->viewCheck()) {
-                $this->jsonError(403, "You do not have permission for this endpoint");
+                $this->jsonError(403, 'You do not have permission for this endpoint');
             }
 
             /** @var BifrostService $indexService */
@@ -147,7 +147,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             $results = $response->getResults() ?? null;
 
             if (!$results) {
-                $this->jsonError(403, "No engines are available to these credentials");
+                $this->jsonError(403, 'No engines are available to these credentials');
             }
 
             $output = [];
@@ -179,7 +179,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     {
         try {
             if ($this->viewCheck()) {
-                $this->jsonError(403, "You do not have permission for this endpoint");
+                $this->jsonError(403, 'You do not have permission for this endpoint');
             }
 
             $output = new stdClass();
@@ -215,7 +215,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     {
         try {
             if ($this->viewCheck()) {
-                $this->jsonError(403, "You do not have permission for this endpoint");
+                $this->jsonError(403, 'You do not have permission for this endpoint');
             }
 
             $engineFullName = $request->getVar('engine');
@@ -242,7 +242,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     {
         try {
             if ($this->editCheck()) {
-                $this->jsonError(403, "You do not have permission for this endpoint");
+                $this->jsonError(403, 'You do not have permission for this endpoint');
             }
 
             $engineFullName = $request->param('Engine');
@@ -258,7 +258,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $this->jsonError(422, 'synonyms cannot be empty');
             }
 
-            if (!in_array($type, [SynonymRule::TYPE_EQUIVALENT, SynonymRule::TYPE_DIRECTIONAL])) {
+            if (!in_array($type, [SynonymRule::TYPE_EQUIVALENT, SynonymRule::TYPE_DIRECTIONAL], true)) {
                 $error = 'type must be one of "TYPE_EQUIVALENT" or "TYPE_DIRECTIONAL"';
 
                 $this->jsonError(422, $error);
@@ -269,8 +269,8 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             $rule->setSynonyms($synonyms);
 
             if ($type === SynonymRule::TYPE_DIRECTIONAL) {
-                if (empty($root)) {
-                    $this->jsonError(422, "Missing root for directional synonym");
+                if (!$root) {
+                    $this->jsonError(422, 'Missing root for directional synonym');
                 }
 
                 $rule->setRoot($root);
@@ -300,7 +300,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     {
         try {
             if ($this->editCheck()) {
-                $this->jsonError(403, "You do not have permission for this endpoint");
+                $this->jsonError(403, 'You do not have permission for this endpoint');
             }
 
             $engineFullName = $request->param('Engine');
@@ -317,11 +317,11 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $this->jsonError(422, 'Must provide an ID');
             }
 
-            if (empty($synonyms)) {
+            if (!$synonyms) {
                 $this->jsonError(422, 'synonyms cannot be empty');
             }
 
-            if (!in_array($type, [SynonymRule::TYPE_EQUIVALENT, SynonymRule::TYPE_DIRECTIONAL])) {
+            if (!in_array($type, [SynonymRule::TYPE_EQUIVALENT, SynonymRule::TYPE_DIRECTIONAL], true)) {
                 $error = 'type must be one of "TYPE_EQUIVALENT" or "TYPE_DIRECTIONAL"';
 
                 $this->jsonError(422, $error);
@@ -332,8 +332,8 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             $rule->setSynonyms($synonyms);
 
             if ($type === SynonymRule::TYPE_DIRECTIONAL) {
-                if (empty($root)) {
-                    $this->jsonError(422, "Missing root for directional synonym");
+                if (!$root) {
+                    $this->jsonError(422, 'Missing root for directional synonym');
                 }
 
                 $rule->setRoot($root);
@@ -365,7 +365,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     {
         try {
             if ($this->editCheck()) {
-                $this->jsonError(403, "You do not have permission for this endpoint");
+                $this->jsonError(403, 'You do not have permission for this endpoint');
             }
 
             $engineFullName = $request->param('Engine');
@@ -402,4 +402,5 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     {
         return !Permission::check(SilverstripeSearchAdmin::SILVERSTRIPE_SEARCH_EDIT_SYNONYMS);
     }
+
 }
