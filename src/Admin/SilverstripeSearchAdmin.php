@@ -32,11 +32,12 @@ use Throwable;
 
 class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 {
+
     private static string $url_segment = 'silverstripesearch';
 
     private static string $menu_title = 'Silverstripe Search';
 
-    private static string $menu_icon_class = "font-icon-search";
+    private static string $menu_icon_class = 'font-icon-search';
 
     private static array $extra_requirements_javascript = [
         'silverstripeltd/silverstripe-bifrost-admin:client/base/dist/release/main.js',
