@@ -135,11 +135,11 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
      */
     public function engines(HTTPRequest $request): string
     {
-        if ($this->viewCheck()) {
-            $this->jsonError(403, "You do not have permission for this endpoint");
-        }
-
         try {
+            if ($this->viewCheck()) {
+                $this->jsonError(403, "You do not have permission for this endpoint");
+            }
+
             /** @var BifrostService $indexService */
             $indexService = Injector::inst()->get(IndexingInterface::class);
             $response = $indexService->getClient()->enginesPost();
@@ -177,19 +177,19 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
      */
     public function getSchema(HTTPRequest $request): string
     {
-        if ($this->viewCheck()) {
-            $this->jsonError(403, "You do not have permission for this endpoint");
-        }
-
-        $output = new stdClass();
-
-        $fullIndexName = $request->getVar('engine');
-
-        if (!$fullIndexName) {
-            return json_encode($output);
-        }
-
         try {
+            if ($this->viewCheck()) {
+                $this->jsonError(403, "You do not have permission for this endpoint");
+            }
+
+            $output = new stdClass();
+
+            $fullIndexName = $request->getVar('engine');
+
+            if (!$fullIndexName) {
+                return json_encode($output);
+            }
+
             /** @var BifrostService $indexService */
             $indexService = Injector::inst()->get(IndexingInterface::class);
             $response = $indexService->getClient()->schemaGet($fullIndexName);
@@ -213,16 +213,16 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
      */
     public function getSynonyms(HTTPRequest $request): string
     {
-        if ($this->viewCheck()) {
-            $this->jsonError(403, "You do not have permission for this endpoint");
-        }
-
-        $engineFullName = $request->getVar('engine');
-        $engineSplit = explode('-', $engineFullName);
-        $engineSuffix = end($engineSplit);
-        $service = SynonymService::singleton();
-
         try {
+            if ($this->viewCheck()) {
+                $this->jsonError(403, "You do not have permission for this endpoint");
+            }
+
+            $engineFullName = $request->getVar('engine');
+            $engineSplit = explode('-', $engineFullName);
+            $engineSuffix = end($engineSplit);
+            $service = SynonymService::singleton();
+
             $response = $service->getSynonymRules($engineSuffix);
 
             return json_encode($response->toArray());
@@ -240,42 +240,42 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
      */
     public function createSynonymRule(HTTPRequest $request): string
     {
-        if ($this->editCheck()) {
-            $this->jsonError(403, "You do not have permission for this endpoint");
-        }
-
-        $engineFullName = $request->param('Engine');
-        $engineSplit = explode('-', $engineFullName);
-        $engineSuffix = end($engineSplit);
-        $data = json_decode($request->getBody());
-
-        $synonyms = $data->synonyms ?? [];
-        $type = $data->type ?? [];
-        $root = $data->root ?? [];
-
-        if (!$synonyms) {
-            $this->jsonError(422, 'synonyms cannot be empty');
-        }
-
-        if (!in_array($type, [SynonymRule::TYPE_EQUIVALENT, SynonymRule::TYPE_DIRECTIONAL])) {
-            $error = 'type must be one of "TYPE_EQUIVALENT" or "TYPE_DIRECTIONAL"';
-
-            $this->jsonError(422, $error);
-        }
-
-        $service = SynonymService::singleton();
-        $rule = new QuerySynonymRule($type);
-        $rule->setSynonyms($synonyms);
-
-        if ($type === SynonymRule::TYPE_DIRECTIONAL) {
-            if (empty($root)) {
-                $this->jsonError(422, "Missing root for directional synonym");
+        try {
+            if ($this->editCheck()) {
+                $this->jsonError(403, "You do not have permission for this endpoint");
             }
 
-            $rule->setRoot($root);
-        }
+            $engineFullName = $request->param('Engine');
+            $engineSplit = explode('-', $engineFullName);
+            $engineSuffix = end($engineSplit);
+            $data = json_decode($request->getBody());
 
-        try {
+            $synonyms = $data->synonyms ?? [];
+            $type = $data->type ?? [];
+            $root = $data->root ?? [];
+
+            if (!$synonyms) {
+                $this->jsonError(422, 'synonyms cannot be empty');
+            }
+
+            if (!in_array($type, [SynonymRule::TYPE_EQUIVALENT, SynonymRule::TYPE_DIRECTIONAL])) {
+                $error = 'type must be one of "TYPE_EQUIVALENT" or "TYPE_DIRECTIONAL"';
+
+                $this->jsonError(422, $error);
+            }
+
+            $service = SynonymService::singleton();
+            $rule = new QuerySynonymRule($type);
+            $rule->setSynonyms($synonyms);
+
+            if ($type === SynonymRule::TYPE_DIRECTIONAL) {
+                if (empty($root)) {
+                    $this->jsonError(422, "Missing root for directional synonym");
+                }
+
+                $rule->setRoot($root);
+            }
+
             $id = $service->createSynonymRule($engineSuffix, $rule);
 
             $outputRule = new SynonymRule($id);
@@ -295,47 +295,47 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 
     public function updateSynonymRule(HTTPRequest $request): string
     {
-        if ($this->editCheck()) {
-            $this->jsonError(403, "You do not have permission for this endpoint");
-        }
-
-        $engineFullName = $request->param('Engine');
-        $engineSplit = explode('-', $engineFullName);
-        $engineSuffix = end($engineSplit);
-        $id = $request->param('ID');
-        $data = json_decode($request->getBody());
-
-        $synonyms = $data->synonyms ?? [];
-        $type = $data->type ?? [];
-        $root = $data->root ?? [];
-
-        if (!$id) {
-            $this->jsonError(422, 'Must provide an ID');
-        }
-
-        if (empty($synonyms)) {
-            $this->jsonError(422, 'synonyms cannot be empty');
-        }
-
-        if (!in_array($type, [SynonymRule::TYPE_EQUIVALENT, SynonymRule::TYPE_DIRECTIONAL])) {
-            $error = 'type must be one of "TYPE_EQUIVALENT" or "TYPE_DIRECTIONAL"';
-
-            $this->jsonError(422, $error);
-        }
-
-        $service = SynonymService::singleton();
-        $rule = new QuerySynonymRule($type);
-        $rule->setSynonyms($synonyms);
-
-        if ($type === SynonymRule::TYPE_DIRECTIONAL) {
-            if (empty($root)) {
-                $this->jsonError(422, "Missing root for directional synonym");
+        try {
+            if ($this->editCheck()) {
+                $this->jsonError(403, "You do not have permission for this endpoint");
             }
 
-            $rule->setRoot($root);
-        }
+            $engineFullName = $request->param('Engine');
+            $engineSplit = explode('-', $engineFullName);
+            $engineSuffix = end($engineSplit);
+            $id = $request->param('ID');
+            $data = json_decode($request->getBody());
 
-        try {
+            $synonyms = $data->synonyms ?? [];
+            $type = $data->type ?? [];
+            $root = $data->root ?? [];
+
+            if (!$id) {
+                $this->jsonError(422, 'Must provide an ID');
+            }
+
+            if (empty($synonyms)) {
+                $this->jsonError(422, 'synonyms cannot be empty');
+            }
+
+            if (!in_array($type, [SynonymRule::TYPE_EQUIVALENT, SynonymRule::TYPE_DIRECTIONAL])) {
+                $error = 'type must be one of "TYPE_EQUIVALENT" or "TYPE_DIRECTIONAL"';
+
+                $this->jsonError(422, $error);
+            }
+
+            $service = SynonymService::singleton();
+            $rule = new QuerySynonymRule($type);
+            $rule->setSynonyms($synonyms);
+
+            if ($type === SynonymRule::TYPE_DIRECTIONAL) {
+                if (empty($root)) {
+                    $this->jsonError(422, "Missing root for directional synonym");
+                }
+
+                $rule->setRoot($root);
+            }
+
             $service->updateSynonymRule($engineSuffix, $id, $rule);
 
             $outputRule = new SynonymRule($id);
@@ -360,22 +360,22 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
      */
     public function deleteSynonymRule(HTTPRequest $request): string
     {
-        if ($this->editCheck()) {
-            $this->jsonError(403, "You do not have permission for this endpoint");
-        }
-
-        $engineFullName = $request->param('Engine');
-        $engineSplit = explode('-', $engineFullName);
-        $engineSuffix = end($engineSplit);
-        $id = $request->param('ID');
-
-        if (!$id) {
-            $this->jsonError(400, 'Missing ID');
-        }
-
-        $service = SynonymService::singleton();
-
         try {
+            if ($this->editCheck()) {
+                $this->jsonError(403, "You do not have permission for this endpoint");
+            }
+
+            $engineFullName = $request->param('Engine');
+            $engineSplit = explode('-', $engineFullName);
+            $engineSuffix = end($engineSplit);
+            $id = $request->param('ID');
+
+            if (!$id) {
+                $this->jsonError(400, 'Missing ID');
+            }
+
+            $service = SynonymService::singleton();
+
             $service->deleteSynonymRule($engineSuffix, $id);
 
             return json_encode([
