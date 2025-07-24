@@ -3,18 +3,14 @@ Name: silverstripe-bifrost-admin
 After: silverstripe-forager
 ---
 SilverstripeSearch\Admin\SilverstripeSearchAdmin:
-    pilets:
-        - name: 'synonyms'
-          version: 1
-          link: 'silverstripeltd/silverstripe-bifrost-admin:client/synonyms/dist/index.js'
-          requireRef: System.import
-          spec: v3
-        - name: 'landing'
-          version: 1
-          link: 'silverstripeltd/silverstripe-bifrost-admin:client/landing/dist/index.js'
-          requireRef: System.import
-          spec: v3
-
-SilverStripe\Forager\Admin\SearchAdmin:
-  menu_title: "Search Indexing"
-  menu_icon_class: font-icon-p-search
+  pilets:
+    - name: 'synonyms'
+      version: 1
+      link: 'silverstripeltd/silverstripe-bifrost-admin:client/synonyms/dist/index.js'
+      requireRef: System.import
+      spec: v3
+    - name: 'landing'
+      version: 1
+      link: 'silverstripeltd/silverstripe-bifrost-admin:client/landing/dist/index.js'
+      requireRef: System.import
+      spec: v3
