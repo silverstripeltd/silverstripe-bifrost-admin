@@ -168,7 +168,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         } catch (EnginesPostNotFoundException $e) {
             $this->jsonError($e->getResponse()->getStatusCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
-            $this->jsonError($e->getCode(), $e->getMessage());
+            $this->jsonError(500, $e->getMessage());
         }
     }
 
@@ -204,7 +204,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         } catch (SchemaGetNotFoundException $e) {
             $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
-            $this->jsonError($e->getCode(), $e->getMessage());
+            $this->jsonError(500, $e->getMessage());
         }
     }
 
@@ -231,7 +231,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         } catch (SynonymRulesGetNotFoundException $e) {
             $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
-            $this->jsonError($e->getCode(), $e->getMessage());
+            $this->jsonError(500, $e->getMessage());
         }
     }
 
@@ -289,10 +289,13 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         } catch (SynonymRulePostNotFoundException $e) {
             $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
-            $this->jsonError($e->getCode(), $e->getMessage());
+            $this->jsonError(500, $e->getMessage());
         }
     }
 
+    /**
+     * @throws HTTPResponse_Exception
+     */
     public function updateSynonymRule(HTTPRequest $request): string
     {
         try {
@@ -349,7 +352,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         } catch (SynonymRulePutUnprocessableEntityException $e) {
             $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
-            $this->jsonError($e->getCode(), $e->getMessage());
+            $this->jsonError(500, $e->getMessage());
         }
     }
 
@@ -386,7 +389,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         } catch (SynonymRuleDeleteUnprocessableEntityException $e) {
             $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
-            $this->jsonError($e->getCode(), $e->getMessage());
+            $this->jsonError(500, $e->getMessage());
         }
     }
 
