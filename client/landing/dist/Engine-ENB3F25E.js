@@ -10,28 +10,24 @@ System.register(["./chunk-REUDOJLT.js", "react"], function (_export, _context) {
       e = _react;
     }],
     execute: function () {
-      h = _ref => {
-        let {
-          rows: r
-        } = _ref;
-        return e.createElement("div", {
-          className: t.container
-        }, e.createElement("h3", {
-          className: t.tableTitle
-        }, "Engine schema"), e.createElement("table", {
-          className: t.table
-        }, e.createElement("thead", null, e.createElement("tr", null, e.createElement("th", {
-          className: t.th
-        }, "Field name"), e.createElement("th", {
-          className: t.th
-        }, "Field type"))), e.createElement("tbody", {
-          className: t.tbody
-        }, r)));
-      }, _export("default", b = _ref2 => {
-        let {
-          match: r,
-          api: m
-        } = _ref2;
+      h = ({
+        rows: r
+      }) => e.createElement("div", {
+        className: t.container
+      }, e.createElement("h3", {
+        className: t.tableTitle
+      }, "Engine schema"), e.createElement("table", {
+        className: t.table
+      }, e.createElement("thead", null, e.createElement("tr", null, e.createElement("th", {
+        className: t.th
+      }, "Field name"), e.createElement("th", {
+        className: t.th
+      }, "Field type"))), e.createElement("tbody", {
+        className: t.tbody
+      }, r))), _export("default", b = ({
+        match: r,
+        api: m
+      }) => {
         let s = r?.params?.engineName,
           [o, n] = e.useState(null),
           [c, i] = e.useState(null);

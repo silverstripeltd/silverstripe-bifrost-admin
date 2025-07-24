@@ -6,7 +6,6 @@ The Silverstripe Search Administration module provides an interface for configur
 
 ## Installation
 
-
 ```sh
 composer require silverstripeltd/silverstripe-bifrost-admin
 ```
@@ -31,3 +30,15 @@ Currently only Synonyms are supported:
 ## More information
 
 You can get more information on the Search Service and its features in the [Service Documentation](https://search.silverstripe.cloud/resources/guides/index.html)
+
+## Contributing
+
+### Yarn
+
+You will need Yarn 4.9.2. If you are using Yarn 1.xx, you will need to upgrade:
+https://yarnpkg.com/getting-started/install
+https://yarnpkg.com/migration/guide#migration-steps
+
+### Building assets
+
+TBA
