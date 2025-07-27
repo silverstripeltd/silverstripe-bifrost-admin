@@ -10,6 +10,7 @@ use SilverStripe\Control\HTTPResponse_Exception;
 use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Core\Manifest\ModuleResourceLoader;
 use SilverStripe\Forager\Interfaces\IndexingInterface;
+use SilverStripe\Forager\Service\IndexConfiguration;
 use SilverStripe\Forager\Service\Query\SynonymRule as QuerySynonymRule;
 use SilverStripe\Forager\Service\Results\SynonymRule;
 use SilverStripe\Forager\Service\SynonymService;
@@ -157,8 +158,9 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $engine = new stdClass();
                 $engine->name = $engineObject->getName();
 
-                $engineSuffix = explode('-', $engine->name);
-                $engineSuffix = end($engineSuffix);
+                $enginePrefix = IndexConfiguration::singleton()->getIndexPrefix();
+                $engineSplit = explode(sprintf('%s-', $enginePrefix), $engine->name);
+                $engineSuffix = end($engineSplit);
 
                 $engine->totalDocs = $indexService->getDocumentTotal($engineSuffix);
 
@@ -219,9 +221,10 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $this->jsonError(403, 'You do not have permission for this endpoint');
             }
 
-            $engineFullName = $request->getVar('engine');
-            $engineSplit = explode('-', $engineFullName);
+            $enginePrefix = IndexConfiguration::singleton()->getIndexPrefix();
+            $engineSplit = explode(sprintf('%s-', $enginePrefix), $request->getVar('engine'));
             $engineSuffix = end($engineSplit);
+
             $service = SynonymService::singleton();
 
             $response = $service->getSynonymRules($engineSuffix);
@@ -246,8 +249,8 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $this->jsonError(403, 'You do not have permission for this endpoint');
             }
 
-            $engineFullName = $request->param('Engine');
-            $engineSplit = explode('-', $engineFullName);
+            $enginePrefix = IndexConfiguration::singleton()->getIndexPrefix();
+            $engineSplit = explode(sprintf('%s-', $enginePrefix), $request->param('Engine'));
             $engineSuffix = end($engineSplit);
             $data = json_decode($request->getBody());
 
@@ -304,8 +307,8 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $this->jsonError(403, 'You do not have permission for this endpoint');
             }
 
-            $engineFullName = $request->param('Engine');
-            $engineSplit = explode('-', $engineFullName);
+            $enginePrefix = IndexConfiguration::singleton()->getIndexPrefix();
+            $engineSplit = explode(sprintf('%s-', $enginePrefix), $request->param('Engine'));
             $engineSuffix = end($engineSplit);
             $id = $request->param('ID');
             $data = json_decode($request->getBody());
@@ -369,8 +372,8 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $this->jsonError(403, 'You do not have permission for this endpoint');
             }
 
-            $engineFullName = $request->param('Engine');
-            $engineSplit = explode('-', $engineFullName);
+            $enginePrefix = IndexConfiguration::singleton()->getIndexPrefix();
+            $engineSplit = explode(sprintf('%s-', $enginePrefix), $request->param('Engine'));
             $engineSuffix = end($engineSplit);
             $id = $request->param('ID');
 
