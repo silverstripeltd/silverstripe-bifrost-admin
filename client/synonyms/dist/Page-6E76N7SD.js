@@ -156,7 +156,7 @@ System.register(["react", "react-modal", "formik", "silverstripe-search-admin"],
             fontSize: "1.2rem"
           },
           className: "font-icon-plus"
-        }), "Create a synonym set")
+        }), "Create a synonym rule")
       }) => {
         let [c, s] = k(!1),
           [n, o] = k(""),
