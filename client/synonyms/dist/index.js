@@ -117,7 +117,7 @@ System.register(["react", "silverstripe-search-admin", "react-router-dom"], func
           className: r.title
         }, o));
       };
-      f = m.lazy(() => _context.import("./Page-6E76N7SD.js"));
+      f = m.lazy(() => _context.import("./Page-TSBIOF2N.js"));
       (function () {
         var d = document;
         var __bundleUrl__ = function () {

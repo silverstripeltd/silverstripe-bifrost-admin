@@ -411,7 +411,7 @@ System.register(["react", "react-modal", "formik", "silverstripe-search-admin"],
         }, "Synonyms relate queries with similar context or meaning together. Use them to guide users to relevant content."), e.createElement(X, {
           add: F,
           onClose: y,
-          text: "Create your first synonym set",
+          text: "Create your first synonym rule",
           buttonClasses: "btn btn-outline-info"
         }));
         return e.createElement("div", {
