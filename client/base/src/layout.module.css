@@ -1,6 +1,7 @@
 :global(.silverstripe-search-admin) {
   container-type: size;
   height: 100%;
+  overflow: auto;
 
   --padding: 1.53856rem;
   --cms-header-colour: #fafbfc;
