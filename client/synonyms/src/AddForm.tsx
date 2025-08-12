@@ -22,7 +22,7 @@ export const AddForm = ({
                 style={{ lineHeight: "10px", marginRight: "0.5rem", fontSize: "1.2rem" }}
                 className="font-icon-plus"
             />
-            Create a synonym set
+            Create a synonym rule
         </span>
     ),
 }: AddFormProps) => {

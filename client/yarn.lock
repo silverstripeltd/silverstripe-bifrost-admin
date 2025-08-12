@@ -6524,15 +6524,15 @@ __metadata:
 
 "silverstripe-search-admin@file:../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz::locator=landing%40workspace%3Alanding":
   version: 1.0.0
-  resolution: "silverstripe-search-admin@file:../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz#../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz::hash=d3208a&locator=landing%40workspace%3Alanding"
-  checksum: 10c0/02abfe1e49bdc264e5543cf06648ca6e14dbe8782527cbd87c08a09880d84ba0bcb3ebb168fa48c7bc603315f812afa460bc9c96fc7443ca844c3304dc0afad2
+  resolution: "silverstripe-search-admin@file:../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz#../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz::hash=6059dc&locator=landing%40workspace%3Alanding"
+  checksum: 10c0/114b9a4974757d14535ddcafd618a30e52df90427a3587735d5d88b119c67d1838e4b8d8f0e03de25a8f09903dd8fb9af77824224b3ab268459d53713cf51b01
   languageName: node
   linkType: hard
 
 "silverstripe-search-admin@file:../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz::locator=synonyms%40workspace%3Asynonyms":
   version: 1.0.0
-  resolution: "silverstripe-search-admin@file:../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz#../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz::hash=d3208a&locator=synonyms%40workspace%3Asynonyms"
-  checksum: 10c0/02abfe1e49bdc264e5543cf06648ca6e14dbe8782527cbd87c08a09880d84ba0bcb3ebb168fa48c7bc603315f812afa460bc9c96fc7443ca844c3304dc0afad2
+  resolution: "silverstripe-search-admin@file:../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz#../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz::hash=6059dc&locator=synonyms%40workspace%3Asynonyms"
+  checksum: 10c0/114b9a4974757d14535ddcafd618a30e52df90427a3587735d5d88b119c67d1838e4b8d8f0e03de25a8f09903dd8fb9af77824224b3ab268459d53713cf51b01
   languageName: node
   linkType: hard
 

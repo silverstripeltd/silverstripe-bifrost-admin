@@ -156,7 +156,7 @@ System.register(["react", "react-modal", "formik", "silverstripe-search-admin"],
             fontSize: "1.2rem"
           },
           className: "font-icon-plus"
-        }), "Create a synonym set")
+        }), "Create a synonym rule")
       }) => {
         let [c, s] = k(!1),
           [n, o] = k(""),
@@ -411,7 +411,7 @@ System.register(["react", "react-modal", "formik", "silverstripe-search-admin"],
         }, "Synonyms relate queries with similar context or meaning together. Use them to guide users to relevant content."), e.createElement(X, {
           add: F,
           onClose: y,
-          text: "Create your first synonym set",
+          text: "Create your first synonym rule",
           buttonClasses: "btn btn-outline-info"
         }));
         return e.createElement("div", {

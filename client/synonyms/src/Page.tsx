@@ -112,7 +112,7 @@ export default ({ api, match }: PageProps) => {
             <AddForm
                 add={addRule}
                 onClose={refresh}
-                text="Create your first synonym set"
+                text="Create your first synonym rule"
                 buttonClasses="btn btn-outline-info"
             />
         </div>
