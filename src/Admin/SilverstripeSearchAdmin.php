@@ -26,6 +26,7 @@ use Silverstripe\Search\Client\Exception\SynonymRulePutNotFoundException;
 use Silverstripe\Search\Client\Exception\SynonymRulePutUnprocessableEntityException;
 use Silverstripe\Search\Client\Exception\SynonymRulesGetNotFoundException;
 use Silverstripe\Search\Client\Exception\SynonymRulesGetUnprocessableEntityException;
+use Silverstripe\Search\Client\Model\Schema;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
 use stdClass;
@@ -195,7 +196,16 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 
             /** @var BifrostService $indexService */
             $indexService = Injector::inst()->get(IndexingInterface::class);
+            /** @var Schema $response */
             $response = $indexService->getClient()->schemaGet($fullIndexName);
+
+            if ($body = $response->getBody()) {
+                $output->body = $body;
+            }
+
+            if ($attachment = $response->getAttachment()) {
+                $output->_attachment = $attachment;
+            }
 
             foreach ($response as $fieldName => $fieldType) {
                 $output->{$fieldName} = $fieldType;
