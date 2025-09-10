@@ -199,11 +199,15 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             /** @var Schema $response */
             $response = $indexService->getClient()->schemaGet($fullIndexName);
 
-            if ($body = $response->getBody()) {
+            $body = $response->getBody();
+
+            if ($body) {
                 $output->body = $body;
             }
 
-            if ($attachment = $response->getAttachment()) {
+            $attachment = $response->getAttachment();
+
+            if ($attachment) {
                 $output->_attachment = $attachment;
             }
 
