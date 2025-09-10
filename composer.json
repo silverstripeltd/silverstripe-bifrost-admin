@@ -13,7 +13,7 @@
     "require": {
         "silverstripe/framework": "^6.0",
         "silverstripe/admin": "^3.0",
-        "silverstripe/silverstripe-forager-bifrost": "dev-feature/version-2-silverstripe-6 as 2.0.0"
+        "silverstripe/silverstripe-forager-bifrost": "2.0.x-dev"
     },
     "require-dev": {
         "silverstripe/recipe-testing": "^4",
@@ -31,7 +31,10 @@
             "client/base/dist",
             "client/synonyms/dist",
             "client/landing/dist"
-        ]
+        ],
+        "branch-alias": {
+            "dev-main": "2.0.x-dev"
+        }
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
