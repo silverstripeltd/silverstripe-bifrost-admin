@@ -3857,8 +3857,8 @@ __metadata:
   linkType: hard
 
 "glob@npm:^10.2.2":
-  version: 10.4.5
-  resolution: "glob@npm:10.4.5"
+  version: 10.5.0
+  resolution: "glob@npm:10.5.0"
   dependencies:
     foreground-child: "npm:^3.1.0"
     jackspeak: "npm:^3.1.2"
@@ -3868,7 +3868,7 @@ __metadata:
     path-scurry: "npm:^1.11.1"
   bin:
     glob: dist/esm/bin.mjs
-  checksum: 10c0/19a9759ea77b8e3ca0a43c2f07ecddc2ad46216b786bb8f993c445aee80d345925a21e5280c7b7c6c59e860a0154b84e4b2b60321fea92cd3c56b4a7489f160e
+  checksum: 10c0/100705eddbde6323e7b35e1d1ac28bcb58322095bd8e63a7d0bef1a2cdafe0d0f7922a981b2b48369a4f8c1b077be5c171804534c3509dfe950dde15fbe6d828
   languageName: node
   linkType: hard
 
@@ -6524,15 +6524,15 @@ __metadata:
 
 "silverstripe-search-admin@file:../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz::locator=landing%40workspace%3Alanding":
   version: 1.0.0
-  resolution: "silverstripe-search-admin@file:../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz#../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz::hash=25a872&locator=landing%40workspace%3Alanding"
-  checksum: 10c0/2025489b7ef891ad495b8b78793b7206a8a0ecd5a27566e1a5ccfeb9d3480b5dcdb750839732a29cc332002962592e41b89a1cf16866aa0dbdf0d3f97e3e32f4
+  resolution: "silverstripe-search-admin@file:../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz#../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz::hash=21520a&locator=landing%40workspace%3Alanding"
+  checksum: 10c0/5d92eb31e302b6ef006f2cc69211bce3619ed369351c28c8d4e91eac0be0107d930cb50fcf118c2b320582faaa1e4250866c1349d824c6ff3164e8d0c69eabac
   languageName: node
   linkType: hard
 
 "silverstripe-search-admin@file:../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz::locator=synonyms%40workspace%3Asynonyms":
   version: 1.0.0
-  resolution: "silverstripe-search-admin@file:../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz#../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz::hash=25a872&locator=synonyms%40workspace%3Asynonyms"
-  checksum: 10c0/2025489b7ef891ad495b8b78793b7206a8a0ecd5a27566e1a5ccfeb9d3480b5dcdb750839732a29cc332002962592e41b89a1cf16866aa0dbdf0d3f97e3e32f4
+  resolution: "silverstripe-search-admin@file:../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz#../base/dist/emulator/silverstripe-search-admin-1.0.0.tgz::hash=21520a&locator=synonyms%40workspace%3Asynonyms"
+  checksum: 10c0/5d92eb31e302b6ef006f2cc69211bce3619ed369351c28c8d4e91eac0be0107d930cb50fcf118c2b320582faaa1e4250866c1349d824c6ff3164e8d0c69eabac
   languageName: node
   linkType: hard
 
