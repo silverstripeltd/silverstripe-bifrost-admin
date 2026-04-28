@@ -129,7 +129,7 @@ System.register(["react", "silverstripe-search-admin", "react-router-dom"], func
           }
           return "/";
         }();
-        ["index.css", "Page-XAZGDAQO.css"].forEach(cf => {
+        ["index.css", "Page-SUJE6PEY.css"].forEach(cf => {
           ;
           var u = __bundleUrl__ + cf;
           var e = d.createElement("link");
