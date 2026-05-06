@@ -15,18 +15,6 @@ use SilverStripe\Forager\Service\Query\SynonymRule as QuerySynonymRule;
 use SilverStripe\Forager\Service\Results\SynonymRule;
 use SilverStripe\Forager\Service\SynonymService;
 use SilverStripe\ForagerBifrost\Service\BifrostService;
-use Silverstripe\Search\Client\Exception\EnginesPostNotFoundException;
-use Silverstripe\Search\Client\Exception\SchemaGetNotFoundException;
-use Silverstripe\Search\Client\Exception\SchemaGetUnprocessableEntityException;
-use Silverstripe\Search\Client\Exception\SynonymRuleDeleteNotFoundException;
-use Silverstripe\Search\Client\Exception\SynonymRuleDeleteUnprocessableEntityException;
-use Silverstripe\Search\Client\Exception\SynonymRulePostNotFoundException;
-use Silverstripe\Search\Client\Exception\SynonymRulePostUnprocessableEntityException;
-use Silverstripe\Search\Client\Exception\SynonymRulePutNotFoundException;
-use Silverstripe\Search\Client\Exception\SynonymRulePutUnprocessableEntityException;
-use Silverstripe\Search\Client\Exception\SynonymRulesGetNotFoundException;
-use Silverstripe\Search\Client\Exception\SynonymRulesGetUnprocessableEntityException;
-use Silverstripe\Search\Client\Model\Schema;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
 use stdClass;
@@ -107,7 +95,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     public function pilets(HTTPRequest $request): string
     {
         $piletConfig = $this->config()->get('pilets');
-        $apiBase = Director::absoluteURL($this->Link()) . '/api/v1';
+        $apiBase = Director::absoluteURL($this->Link()) . 'api/v1';
 
         $piletConfig = array_map(static function ($pilet) use ($apiBase) {
             if (array_key_exists('link', $pilet)) {
@@ -147,7 +135,12 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             $indexService = Injector::inst()->get(IndexingInterface::class);
             $response = $indexService->getClient()->enginesPost();
 
-            $results = $response->getResults() ?? null;
+            if ($response->getStatusCode() >= 400) {
+                $this->jsonError($response->getStatusCode(), (string) $response->getBody());
+            }
+
+            $body = json_decode((string) $response->getBody());
+            $results = $body->results ?? null;
 
             if (!$results) {
                 $this->jsonError(403, 'No engines are available to these credentials');
@@ -157,7 +150,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 
             foreach ($results as $engineObject) {
                 $engine = new stdClass();
-                $engine->name = $engineObject->getName();
+                $engine->name = $engineObject->name;
 
                 $enginePrefix = IndexConfiguration::singleton()->getIndexPrefix();
                 $engineSplit = explode(sprintf('%s-', $enginePrefix), $engine->name);
@@ -169,8 +162,6 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             }
 
             return json_encode($output);
-        } catch (EnginesPostNotFoundException $e) {
-            $this->jsonError($e->getResponse()->getStatusCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
             $this->jsonError(500, $e->getMessage());
         }
@@ -196,30 +187,21 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 
             /** @var BifrostService $indexService */
             $indexService = Injector::inst()->get(IndexingInterface::class);
-            /** @var Schema $response */
             $response = $indexService->getClient()->schemaGet($fullIndexName);
 
-            $body = $response->getBody();
-
-            if ($body) {
-                $output->body = $body;
+            if ($response->getStatusCode() >= 400) {
+                $this->jsonError($response->getStatusCode(), (string) $response->getBody());
             }
 
-            $attachment = $response->getAttachment();
+            $schema = json_decode((string) $response->getBody());
 
-            if ($attachment) {
-                $output->_attachment = $attachment;
-            }
-
-            foreach ($response as $fieldName => $fieldType) {
-                $output->{$fieldName} = $fieldType;
+            if ($schema) {
+                foreach ($schema as $fieldName => $fieldType) {
+                    $output->{$fieldName} = $fieldType;
+                }
             }
 
             return json_encode($output);
-        } catch (SchemaGetUnprocessableEntityException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
-        } catch (SchemaGetNotFoundException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
             $this->jsonError(500, $e->getMessage());
         }
@@ -244,10 +226,6 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             $response = $service->getSynonymRules($engineSuffix);
 
             return json_encode($response->toArray());
-        } catch (SynonymRulesGetUnprocessableEntityException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
-        } catch (SynonymRulesGetNotFoundException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
             $this->jsonError(500, $e->getMessage());
         }
@@ -302,10 +280,6 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             $outputRule->setRoot($root);
 
             return json_encode($outputRule);
-        } catch (SynonymRulePostUnprocessableEntityException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
-        } catch (SynonymRulePostNotFoundException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
             $this->jsonError(500, $e->getMessage());
         }
@@ -365,10 +339,6 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             $outputRule->setRoot($root);
 
             return json_encode($outputRule);
-        } catch (SynonymRulePutNotFoundException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
-        } catch (SynonymRulePutUnprocessableEntityException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
             $this->jsonError(500, $e->getMessage());
         }
@@ -402,10 +372,6 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             return json_encode([
                 'status' => 'success',
             ]);
-        } catch (SynonymRuleDeleteNotFoundException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
-        } catch (SynonymRuleDeleteUnprocessableEntityException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
         } catch (Throwable $e) {
             $this->jsonError(500, $e->getMessage());
         }
