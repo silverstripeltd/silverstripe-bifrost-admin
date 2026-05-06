@@ -8,8 +8,6 @@
   "dependencies": {
     "formik": "^2.4.6",
     "piral": "1.8.5",
-    "piral-base": "1.8.5",
-    "piral-core": "1.8.5",
     "react": "18",
     "react-dom": "^18",
     "react-modal": "^3.16.3",
@@ -23,6 +21,7 @@
     "build": "piral build --public-url 'admin/silverstripesearch/'",
     "release": "piral build --public-url 'admin/silverstripesearch/' --fresh",
     "watch": "SS_ENV=dev && piral build --optimize-modules true --source-maps true --type release --watch  --no-minify --public-url 'admin/silverstripesearch/'",
+    "dev": "SS_ENV=dev && piral build --optimize-modules true --source-maps true --type release  --no-minify --public-url 'admin/silverstripesearch/'",
     "postinstall": "piral declaration"
   },
   "types": "dist/index.d.ts",

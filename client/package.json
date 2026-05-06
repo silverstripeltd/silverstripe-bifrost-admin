@@ -13,12 +13,9 @@
   "dependencies": {
     "esbuild": "^0.25.8",
     "piral-cli": "^1.8.5",
-    "piral-cli-esbuild": "^1.2.2",
+    "piral-cli-esbuild": "^1.4.0",
     "typescript": "^5.8"
   },
-  "workspaces": [
-    "*"
-  ],
   "devDependencies": {
     "@babel/runtime": "^7.20.0",
     "@silverstripe/eslint-config": "^1.0.0",
