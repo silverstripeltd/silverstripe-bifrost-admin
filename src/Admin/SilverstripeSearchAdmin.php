@@ -100,7 +100,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
         $piletConfig = array_map(static function ($pilet) use ($apiBase) {
             if (array_key_exists('link', $pilet)) {
                 // resolve any silverstripe location references
-                $pilet['link'] = ModuleResourceLoader::singleton()->resolveURL($pilet['link']);
+                $pilet['link'] = Director::absoluteURL(ModuleResourceLoader::singleton()->resolveURL($pilet['link']));
             }
 
             // add url of controller for api requests
