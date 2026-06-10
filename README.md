@@ -1,11 +1,13 @@
+> [!WARNING]
+> This module is no longer actively maintained. Functionality for managing Silverstripe Search configuration has moved to the [Silverstripe Search Dashboard](https://dashboard.silverstripe.cloud)
+
+
 ![Silverstripe Search](./docs/images/logo.svg)
 
 # Silverstripe Search Administration module
 
 The Silverstripe Search Administration module provides an interface for configuring your search settings from within the Silverstripe CMS.
 
-> [!WARNING]
-> This module is no longer actively maintained. Functionality for managing Silverstripe Search configuration has moved to the [Silverstripe Search Dashboard](https://dashboard.silverstripe.cloud)
 
 ## Installation
 
