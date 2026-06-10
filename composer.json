@@ -26,6 +26,11 @@
             "SilverstripeSearch\\Tests\\": "tests/php/"
         }
     },
+    "autoload-dev": {
+        "classmap": [
+            "tests/php/Page.php"
+        ]
+    },
     "extra": {
         "expose": [
             "client/base/dist",
