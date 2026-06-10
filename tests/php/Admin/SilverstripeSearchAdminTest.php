@@ -10,6 +10,7 @@ use SilverStripe\Core\Injector\Injector;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Forager\Interfaces\DocumentInterface;
 use SilverStripe\Forager\Interfaces\IndexingInterface;
+use SilverStripe\Forager\Service\IndexConfiguration;
 use SilverStripe\Forager\Service\Results\SynonymRule;
 use SilverstripeSearch\Admin\SilverstripeSearchAdmin;
 
@@ -96,6 +97,8 @@ class SilverstripeSearchAdminTest extends TestCase
 
     public function testEnginesParsesRawClientResponse(): void
     {
+        IndexConfiguration::config()->set('index_prefix', 'search');
+
         $service = new TestIndexingService();
         $service->enginesResponse = new Response(200, [], json_encode([
             'results' => [
