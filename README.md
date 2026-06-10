@@ -1,5 +1,5 @@
 > [!WARNING]
-> This module is no longer actively maintained. Functionality for managing Silverstripe Search configuration has moved to the [Silverstripe Search Dashboard](https://dashboard.silverstripe.cloud)
+> This module is deprecated and will be removed in the next major version. Functionality for managing Silverstripe Search configuration has moved to the [Silverstripe Search Dashboard](https://dashboard.silverstripe.cloud)
 
 
 ![Silverstripe Search](./docs/images/logo.svg)
