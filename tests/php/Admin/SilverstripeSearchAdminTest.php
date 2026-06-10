@@ -13,6 +13,14 @@ use SilverStripe\Forager\Interfaces\IndexingInterface;
 use SilverStripe\Forager\Service\Results\SynonymRule;
 use SilverstripeSearch\Admin\SilverstripeSearchAdmin;
 
+if (!class_exists('Page')) {
+    eval('class Page extends \\SilverStripe\\CMS\\Model\\SiteTree {}');
+}
+
+if (!class_exists('PageController')) {
+    eval('class PageController extends \\SilverStripe\\CMS\\Controllers\\ContentController {}');
+}
+
 class SilverstripeSearchAdminTest extends TestCase
 {
     public static function setUpBeforeClass(): void
