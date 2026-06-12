@@ -370,7 +370,15 @@ class TestIndexingService implements IndexingInterface
 
     public function getDocumentTotal(string $indexSuffix): int
     {
-        return $this->documentTotals[$indexSuffix] ?? 0;
+        if (array_key_exists($indexSuffix, $this->documentTotals)) {
+            return $this->documentTotals[$indexSuffix];
+        }
+
+        $suffix = str_contains($indexSuffix, '-')
+            ? substr($indexSuffix, strrpos($indexSuffix, '-') + 1)
+            : $indexSuffix;
+
+        return $this->documentTotals[$suffix] ?? 0;
     }
 
     public function clearIndexDocuments(string $indexSuffix, int $batchSize): int
