@@ -18,6 +18,7 @@ use SilverStripe\ForagerBifrost\Service\BifrostService;
 use Silverstripe\Search\Client\Request\Engine\SynonymRuleRequest as ClientSynonymRuleRequest;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
+use stdClass;
 use Throwable;
 
 class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
@@ -115,7 +116,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             return $pilet;
         }, $piletConfig);
 
-        $response = new \stdClass();
+        $response = new stdClass();
         $response->items = $piletConfig;
 
         return json_encode($response);
@@ -146,7 +147,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             $output = [];
 
             foreach ($results as $engineObject) {
-                $engine = new \stdClass();
+                $engine = new stdClass();
                 $engine->name = $engineObject->name;
 
                 $enginePrefix = IndexConfiguration::singleton()->getIndexPrefix();
@@ -178,7 +179,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $this->jsonError(403, 'You do not have permission for this endpoint');
             }
 
-            $output = new \stdClass();
+            $output = new stdClass();
 
             $fullIndexName = $request->getVar('engine');
 
@@ -226,6 +227,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             $this->throwJsonErrorForResponse($response);
 
             $rules = [];
+
             foreach ($this->decodeJsonResponse($response) ?? [] as $ruleBody) {
                 $rules[] = $this->buildSynonymRuleFromBody($ruleBody);
             }
@@ -405,9 +407,11 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 
     private function throwJsonErrorForResponse(object $response): void
     {
-        if ($response->getStatusCode() >= 400) {
-            $this->jsonError($response->getStatusCode(), (string) $response->getBody());
+        if ($response->getStatusCode() < 400) {
+            return;
         }
+
+        $this->jsonError($response->getStatusCode(), (string) $response->getBody());
     }
 
     private function decodeJsonResponse(object $response): mixed
