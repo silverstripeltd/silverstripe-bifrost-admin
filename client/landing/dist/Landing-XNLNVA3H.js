@@ -33,7 +33,7 @@ System.register(["./chunk-REUDOJLT.js", "react", "silverstripe-search-admin", "r
         target: "_blank",
         rel: "noopener noreferrer",
         href: "https://dashboard.silverstripe.cloud/search"
-      }, a.createElement("strong", null, "Silverstripe Search Dashboard")), " ", "is the new home for Silverstripe Search administration. Features include relevancy tuning, result curation, synonym management and query analytics.")));
+      }, a.createElement("strong", null, "Silverstripe Search Dashboard")), " ", "is the new home for Silverstripe Search administration. Features include relevancy tuning, result curation, synonym management, and query analytics.")));
       u = ({
         engines: s
       }) => {

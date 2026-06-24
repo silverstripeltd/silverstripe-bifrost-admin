@@ -20,7 +20,7 @@ export default () => {
                     </a>{" "}
                     is the new home for Silverstripe Search administration.
                     Features include relevancy tuning, result curation, synonym
-                    management and query analytics.
+                    management, and query analytics.
                 </p>
             </div>
         </div>
