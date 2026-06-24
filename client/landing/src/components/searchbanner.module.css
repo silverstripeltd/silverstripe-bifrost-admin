@@ -10,7 +10,7 @@
 }
 
 .link {
-  display: block;
+  display: inline-block;
   color: var(--white);
   text-decoration: underline;
 }

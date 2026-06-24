@@ -1,59 +1,39 @@
 System.register(["./chunk-REUDOJLT.js", "react", "silverstripe-search-admin", "react-router-dom"], function (_export, _context) {
   "use strict";
 
-  var c, r, n, k, o, g, e, p, f, v, b, a, h, u, D;
+  var c, r, n, k, a, v, e, p, f, b, g, o, h, u, F;
   return {
     setters: [function (_chunkREUDOJLTJs) {
       c = _chunkREUDOJLTJs.a;
       r = _chunkREUDOJLTJs.b;
     }, function (_react) {
       n = _react.default;
-      o = _react.default;
+      a = _react.default;
       e = _react.default;
     }, function (_silverstripeSearchAdmin) {
       k = _silverstripeSearchAdmin.ForbiddenError;
-      g = _silverstripeSearchAdmin.Logo;
+      v = _silverstripeSearchAdmin.Logo;
     }, function (_reactRouterDom) {
       p = _reactRouterDom.Link;
     }],
     execute: function () {
-      f = "searchbanner-module__banner_OzqzSa__100", v = "searchbanner-module__externalIcon_OzqzSa__100", b = "searchbanner-module__link_OzqzSa__100", a = {
+      f = "searchbanner-module__banner_OzqzSa__100", b = "searchbanner-module__externalIcon_OzqzSa__100", g = "searchbanner-module__link_OzqzSa__100", o = {
         banner: f,
-        externalIcon: v,
-        link: b
+        externalIcon: b,
+        link: g
       };
-      h = () => o.createElement("div", {
-        className: a.banner
-      }, o.createElement(g, {
-        className: a.title
-      }), o.createElement("div", null, o.createElement("p", {
-        className: a.text
-      }, o.createElement("a", {
-        className: a.link,
+      h = () => a.createElement("div", {
+        className: o.banner
+      }, a.createElement(v, {
+        className: o.title
+      }), a.createElement("div", null, a.createElement("p", {
+        className: o.text
+      }, "The", a.createElement("a", {
+        className: o.link,
         target: "_blank",
         rel: "noopener noreferrer",
         href: "https://dashboard.silverstripe.cloud/search"
-      }, "Silverstripe Search dashboard", o.createElement("svg", {
-        className: a.externalIcon,
-        width: "12",
-        height: "12",
-        viewBox: "0 0 24 24",
-        fill: "none",
-        stroke: "currentColor",
-        strokeWidth: "2",
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-        "aria-hidden": "true"
-      }, o.createElement("path", {
-        d: "M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"
-      }), o.createElement("polyline", {
-        points: "15 3 21 3 21 9"
-      }), o.createElement("line", {
-        x1: "10",
-        y1: "14",
-        x2: "21",
-        y2: "3"
-      })), o.createElement("strong", null, "The Silverstripe Search Dashboard")), " ", "is the new home for Silverstripe Search administration. Features include relevancy tuning, result curation, synonym management and query analytics.")));
+      }, a.createElement("strong", null, "Silverstripe Search Dashboard")), " ", "is the new home for Silverstripe Search administration. Features include relevancy tuning, result curation, synonym management and query analytics.")));
       u = ({
         engines: s
       }) => {
@@ -95,28 +75,28 @@ System.register(["./chunk-REUDOJLT.js", "react", "silverstripe-search-admin", "r
           className: r.tbody
         }, l)));
       };
-      _export("default", D = ({
+      _export("default", F = ({
         api: s
       }) => {
         let [l, t] = n.useState([]),
           [i, _] = n.useState(null);
         return n.useEffect(() => {
-          s.getEngines().then(t).catch(d => {
-            console.error(d);
-            let m = `Error fetching information about your search
+          s.getEngines().then(t).catch(m => {
+            console.error(m);
+            let d = `Error fetching information about your search
                                     subscription. Please check your module installation.`;
-            if (d instanceof k) switch (d.code) {
+            if (m instanceof k) switch (m.code) {
               case 401:
-                m = `Your API key does not have permission to access the service.
+                d = `Your API key does not have permission to access the service.
                                 Please check that it is configured correctly.`;
                 break;
               default:
-                m = `You don't have permission to view this content.
+                d = `You don't have permission to view this content.
                                Please check that you have the appropriate CMS permissions set.`;
             }
             _(n.createElement("div", {
               className: "engine"
-            }, n.createElement("p", null, m)));
+            }, n.createElement("p", null, d)));
           });
         }, []), n.createElement("div", {
           className: c.page
