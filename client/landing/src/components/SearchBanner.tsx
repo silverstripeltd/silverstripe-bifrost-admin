@@ -8,7 +8,7 @@ export default () => {
             <Logo className={styles.title} />
             <div>
                 <p className={styles.text}>
-                    The
+                    The{" "}
                     <a
                         className={styles.link}
                         target="_blank"

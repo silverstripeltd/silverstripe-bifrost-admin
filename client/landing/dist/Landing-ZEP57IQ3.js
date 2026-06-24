@@ -28,7 +28,7 @@ System.register(["./chunk-REUDOJLT.js", "react", "silverstripe-search-admin", "r
         className: o.title
       }), a.createElement("div", null, a.createElement("p", {
         className: o.text
-      }, "The", a.createElement("a", {
+      }, "The", " ", a.createElement("a", {
         className: o.link,
         target: "_blank",
         rel: "noopener noreferrer",
