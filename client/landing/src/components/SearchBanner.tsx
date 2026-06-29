@@ -7,27 +7,21 @@ export default () => {
         <div className={styles.banner}>
             <Logo className={styles.title} />
             <div>
-                <p className={styles.text}>Silverstripe Search is a managed service and actively under development. While we're working on a stand-alone dashboard, your engines can be managed here in the CMS</p>
-                <a
-                    className={styles.link}
-                    href="/admin/search-service"
-                >
-                    Search indexing administration
-                </a>
-                <a
-                    className={styles.link}
-                    target="_blank"
-                    href="https://9595b293cf40d7532796c4ca67a27b81-bifrost.silverstripe.io/resources/guides/index.html"
-                >
-                    Customer guides
-                </a>
-                <a
-                    className={styles.link}
-                    target="_blank"
-                    href="https://9595b293cf40d7532796c4ca67a27b81-bifrost.silverstripe.io/api/v1/docs"
-                >
-                    API specification
-                </a>
+                <p className={styles.text}>
+                    The{" "}
+                    <a
+                        className={styles.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        href="https://dashboard.silverstripe.cloud/search"
+                    >
+                        <strong>Silverstripe Search Dashboard</strong>
+
+                    </a>{" "}
+                    is the new home for Silverstripe Search administration.
+                    Features include relevancy tuning, result curation, synonym
+                    management, and query analytics.
+                </p>
             </div>
         </div>
     );

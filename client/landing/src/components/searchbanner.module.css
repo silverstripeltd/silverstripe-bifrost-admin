@@ -10,7 +10,7 @@
 }
 
 .link {
-  display: block;
+  display: inline-block;
   color: var(--white);
   text-decoration: underline;
 }
@@ -22,4 +22,9 @@
 
 .link + .link {
   margin-top: 0.4rem;
+}
+
+.externalIcon {
+  vertical-align: middle;
+  margin-left: 0.4rem;
 }

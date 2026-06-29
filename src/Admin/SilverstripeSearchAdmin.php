@@ -13,20 +13,9 @@ use SilverStripe\Forager\Interfaces\IndexingInterface;
 use SilverStripe\Forager\Service\IndexConfiguration;
 use SilverStripe\Forager\Service\Query\SynonymRule as QuerySynonymRule;
 use SilverStripe\Forager\Service\Results\SynonymRule;
-use SilverStripe\Forager\Service\SynonymService;
+use SilverStripe\ForagerBifrost\Processors\SynonymRuleProcessor;
 use SilverStripe\ForagerBifrost\Service\BifrostService;
-use Silverstripe\Search\Client\Exception\EnginesPostNotFoundException;
-use Silverstripe\Search\Client\Exception\SchemaGetNotFoundException;
-use Silverstripe\Search\Client\Exception\SchemaGetUnprocessableEntityException;
-use Silverstripe\Search\Client\Exception\SynonymRuleDeleteNotFoundException;
-use Silverstripe\Search\Client\Exception\SynonymRuleDeleteUnprocessableEntityException;
-use Silverstripe\Search\Client\Exception\SynonymRulePostNotFoundException;
-use Silverstripe\Search\Client\Exception\SynonymRulePostUnprocessableEntityException;
-use Silverstripe\Search\Client\Exception\SynonymRulePutNotFoundException;
-use Silverstripe\Search\Client\Exception\SynonymRulePutUnprocessableEntityException;
-use Silverstripe\Search\Client\Exception\SynonymRulesGetNotFoundException;
-use Silverstripe\Search\Client\Exception\SynonymRulesGetUnprocessableEntityException;
-use Silverstripe\Search\Client\Model\Schema;
+use Silverstripe\Search\Client\Request\Engine\SynonymRuleRequest as ClientSynonymRuleRequest;
 use SilverStripe\Security\Permission;
 use SilverStripe\Security\PermissionProvider;
 use stdClass;
@@ -107,12 +96,12 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
     public function pilets(HTTPRequest $request): string
     {
         $piletConfig = $this->config()->get('pilets');
-        $apiBase = Director::absoluteURL($this->Link()) . '/api/v1';
+        $apiBase = Director::absoluteURL($this->Link()) . 'api/v1';
 
         $piletConfig = array_map(static function ($pilet) use ($apiBase) {
             if (array_key_exists('link', $pilet)) {
                 // resolve any silverstripe location references
-                $pilet['link'] = ModuleResourceLoader::singleton()->resolveURL($pilet['link']);
+                $pilet['link'] = Director::absoluteURL(ModuleResourceLoader::singleton()->resolveURL($pilet['link']));
             }
 
             // add url of controller for api requests
@@ -146,8 +135,10 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             /** @var BifrostService $indexService */
             $indexService = Injector::inst()->get(IndexingInterface::class);
             $response = $indexService->getClient()->enginesPost();
+            $this->throwJsonErrorForResponse($response);
 
-            $results = $response->getResults() ?? null;
+            $body = $this->decodeJsonResponse($response);
+            $results = $body->results ?? null;
 
             if (!$results) {
                 $this->jsonError(403, 'No engines are available to these credentials');
@@ -157,7 +148,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 
             foreach ($results as $engineObject) {
                 $engine = new stdClass();
-                $engine->name = $engineObject->getName();
+                $engine->name = $engineObject->name;
 
                 $enginePrefix = IndexConfiguration::singleton()->getIndexPrefix();
                 $engineSplit = explode(sprintf('%s-', $enginePrefix), $engine->name);
@@ -169,11 +160,13 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
             }
 
             return json_encode($output);
-        } catch (EnginesPostNotFoundException $e) {
-            $this->jsonError($e->getResponse()->getStatusCode(), (string) $e->getResponse()->getBody());
+        } catch (HTTPResponse_Exception $e) {
+            throw $e;
         } catch (Throwable $e) {
             $this->jsonError(500, $e->getMessage());
         }
+
+        return '';
     }
 
     /**
@@ -196,33 +189,25 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
 
             /** @var BifrostService $indexService */
             $indexService = Injector::inst()->get(IndexingInterface::class);
-            /** @var Schema $response */
             $response = $indexService->getClient()->schemaGet($fullIndexName);
+            $this->throwJsonErrorForResponse($response);
 
-            $body = $response->getBody();
+            $schema = $this->decodeJsonResponse($response);
 
-            if ($body) {
-                $output->body = $body;
-            }
-
-            $attachment = $response->getAttachment();
-
-            if ($attachment) {
-                $output->_attachment = $attachment;
-            }
-
-            foreach ($response as $fieldName => $fieldType) {
-                $output->{$fieldName} = $fieldType;
+            if ($schema) {
+                foreach ($schema as $fieldName => $fieldType) {
+                    $output->{$fieldName} = $fieldType;
+                }
             }
 
             return json_encode($output);
-        } catch (SchemaGetUnprocessableEntityException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
-        } catch (SchemaGetNotFoundException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (HTTPResponse_Exception $e) {
+            throw $e;
         } catch (Throwable $e) {
             $this->jsonError(500, $e->getMessage());
         }
+
+        return '';
     }
 
     /**
@@ -235,22 +220,26 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $this->jsonError(403, 'You do not have permission for this endpoint');
             }
 
-            $enginePrefix = IndexConfiguration::singleton()->getIndexPrefix();
-            $engineSplit = explode(sprintf('%s-', $enginePrefix), $request->getVar('engine'));
-            $engineSuffix = end($engineSplit);
+            $engineName = (string) $request->getVar('engine');
+            /** @var BifrostService $indexService */
+            $indexService = Injector::inst()->get(IndexingInterface::class);
+            $response = $indexService->getClient()->synonymRulesGet($engineName);
+            $this->throwJsonErrorForResponse($response);
 
-            $service = SynonymService::singleton();
+            $rules = [];
 
-            $response = $service->getSynonymRules($engineSuffix);
+            foreach ($this->decodeJsonResponse($response) ?? [] as $ruleBody) {
+                $rules[] = $this->buildSynonymRuleFromBody($ruleBody);
+            }
 
-            return json_encode($response->toArray());
-        } catch (SynonymRulesGetUnprocessableEntityException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
-        } catch (SynonymRulesGetNotFoundException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+            return json_encode($rules);
+        } catch (HTTPResponse_Exception $e) {
+            throw $e;
         } catch (Throwable $e) {
             $this->jsonError(500, $e->getMessage());
         }
+
+        return '';
     }
 
     /**
@@ -263,9 +252,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $this->jsonError(403, 'You do not have permission for this endpoint');
             }
 
-            $enginePrefix = IndexConfiguration::singleton()->getIndexPrefix();
-            $engineSplit = explode(sprintf('%s-', $enginePrefix), $request->param('Engine'));
-            $engineSuffix = end($engineSplit);
+            $engineName = (string) $request->param('Engine');
             $data = json_decode($request->getBody());
 
             $synonyms = $data->synonyms ?? [];
@@ -282,7 +269,6 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $this->jsonError(422, $error);
             }
 
-            $service = SynonymService::singleton();
             $rule = new QuerySynonymRule($type);
             $rule->setSynonyms($synonyms);
 
@@ -294,21 +280,22 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $rule->setRoot($root);
             }
 
-            $id = $service->createSynonymRule($engineSuffix, $rule);
+            /** @var BifrostService $indexService */
+            $indexService = Injector::inst()->get(IndexingInterface::class);
+            $requestBody = new ClientSynonymRuleRequest(SynonymRuleProcessor::getStringFromQuery($rule));
+            $response = $indexService->getClient()->synonymRulePost($engineName, $requestBody);
+            $this->throwJsonErrorForResponse($response);
 
-            $outputRule = new SynonymRule($id);
-            $outputRule->setType($type);
-            $outputRule->setSynonyms($synonyms);
-            $outputRule->setRoot($root);
+            $outputRule = $this->buildSynonymRuleFromBody($this->decodeJsonResponse($response));
 
             return json_encode($outputRule);
-        } catch (SynonymRulePostUnprocessableEntityException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
-        } catch (SynonymRulePostNotFoundException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (HTTPResponse_Exception $e) {
+            throw $e;
         } catch (Throwable $e) {
             $this->jsonError(500, $e->getMessage());
         }
+
+        return '';
     }
 
     /**
@@ -321,9 +308,7 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $this->jsonError(403, 'You do not have permission for this endpoint');
             }
 
-            $enginePrefix = IndexConfiguration::singleton()->getIndexPrefix();
-            $engineSplit = explode(sprintf('%s-', $enginePrefix), $request->param('Engine'));
-            $engineSuffix = end($engineSplit);
+            $engineName = (string) $request->param('Engine');
             $id = $request->param('ID');
             $data = json_decode($request->getBody());
 
@@ -345,7 +330,6 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $this->jsonError(422, $error);
             }
 
-            $service = SynonymService::singleton();
             $rule = new QuerySynonymRule($type);
             $rule->setSynonyms($synonyms);
 
@@ -357,21 +341,22 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $rule->setRoot($root);
             }
 
-            $service->updateSynonymRule($engineSuffix, $id, $rule);
+            /** @var BifrostService $indexService */
+            $indexService = Injector::inst()->get(IndexingInterface::class);
+            $requestBody = new ClientSynonymRuleRequest(SynonymRuleProcessor::getStringFromQuery($rule));
+            $response = $indexService->getClient()->synonymRulePut($engineName, (string) $id, $requestBody);
+            $this->throwJsonErrorForResponse($response);
 
-            $outputRule = new SynonymRule($id);
-            $outputRule->setType($type);
-            $outputRule->setSynonyms($synonyms);
-            $outputRule->setRoot($root);
+            $outputRule = $this->buildSynonymRuleFromBody($this->decodeJsonResponse($response));
 
             return json_encode($outputRule);
-        } catch (SynonymRulePutNotFoundException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
-        } catch (SynonymRulePutUnprocessableEntityException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (HTTPResponse_Exception $e) {
+            throw $e;
         } catch (Throwable $e) {
             $this->jsonError(500, $e->getMessage());
         }
+
+        return '';
     }
 
     /**
@@ -386,39 +371,60 @@ class SilverstripeSearchAdmin extends LeftAndMain implements PermissionProvider
                 $this->jsonError(403, 'You do not have permission for this endpoint');
             }
 
-            $enginePrefix = IndexConfiguration::singleton()->getIndexPrefix();
-            $engineSplit = explode(sprintf('%s-', $enginePrefix), $request->param('Engine'));
-            $engineSuffix = end($engineSplit);
+            $engineName = (string) $request->param('Engine');
             $id = $request->param('ID');
 
             if (!$id) {
                 $this->jsonError(400, 'Missing ID');
             }
 
-            $service = SynonymService::singleton();
-
-            $service->deleteSynonymRule($engineSuffix, $id);
+            /** @var BifrostService $indexService */
+            $indexService = Injector::inst()->get(IndexingInterface::class);
+            $response = $indexService->getClient()->synonymRuleDelete($engineName, (string) $id);
+            $this->throwJsonErrorForResponse($response);
 
             return json_encode([
                 'status' => 'success',
             ]);
-        } catch (SynonymRuleDeleteNotFoundException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
-        } catch (SynonymRuleDeleteUnprocessableEntityException $e) {
-            $this->jsonError($e->getCode(), (string) $e->getResponse()->getBody());
+        } catch (HTTPResponse_Exception $e) {
+            throw $e;
         } catch (Throwable $e) {
             $this->jsonError(500, $e->getMessage());
         }
+
+        return '';
     }
 
-    private function viewCheck(): bool
+    protected function viewCheck(): bool
     {
         return !Permission::check(SilverstripeSearchAdmin::SILVERSTRIPE_SEARCH_VIEW_SYNONYMS);
     }
 
-    private function editCheck(): bool
+    protected function editCheck(): bool
     {
         return !Permission::check(SilverstripeSearchAdmin::SILVERSTRIPE_SEARCH_EDIT_SYNONYMS);
+    }
+
+    private function throwJsonErrorForResponse(object $response): void
+    {
+        if ($response->getStatusCode() < 400) {
+            return;
+        }
+
+        $this->jsonError($response->getStatusCode(), (string) $response->getBody());
+    }
+
+    private function decodeJsonResponse(object $response): mixed
+    {
+        return json_decode((string) $response->getBody());
+    }
+
+    private function buildSynonymRuleFromBody(object $ruleBody): SynonymRule
+    {
+        $rule = new SynonymRule($ruleBody->id);
+        SynonymRuleProcessor::applyStringToResult($rule, $ruleBody->synonyms);
+
+        return $rule;
     }
 
 }
